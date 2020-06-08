@@ -34,39 +34,38 @@ public class RentalParser {
 
         ArrayList<RentalDTO> rentalDTO = new ArrayList<RentalDTO>();
 
-        String stationName = null, latitude= null, longitude=null;
-        boolean bstationName = false, blatitude= false, blongitude=false;
-
+        String stationName = null, stationLatitude= null, stationLongitude=null;
+        boolean bstationName = false, bstationLatitude= false, bstationLongitude=false;
         while (event_type != XmlPullParser.END_DOCUMENT) {
             if (event_type == XmlPullParser.START_TAG) {
                 tag = xpp.getName();
                 if(tag.equals("stationName")){
                     bstationName = true;
                 }
-                if(tag.equals("latitude")){
-                    blatitude = true;
+                if(tag.equals("stationLatitude")){
+                    bstationLatitude = true;
                 }
-                if(tag.equals("longitude")){
-                    blongitude = true;
+                if(tag.equals("stationLongitude")){
+                    bstationLongitude = true;
                 }
             } else if (event_type == XmlPullParser.TEXT) {
                 if(bstationName == true){
                     stationName = xpp.getText();
                     bstationName = false;
-                } else if(blatitude == true){
-                    latitude = xpp.getText();
-                    blatitude = false;
-                } else if(blongitude == true){
-                    longitude = xpp.getText();
-                    blongitude = false;
+                } else if(bstationLatitude == true){
+                    stationLatitude = xpp.getText();
+                    bstationLatitude = false;
+                } else if(bstationLongitude == true){
+                    stationLongitude = xpp.getText();
+                    bstationLongitude = false;
                 }
             } else if (event_type == XmlPullParser.END_TAG){
                 tag = xpp.getName();
                 if (tag.equals("row")){
                     RentalDTO entity = new RentalDTO();
                     entity.setStationName(stationName);
-                    entity.setLatitude(Double.valueOf(latitude));
-                    entity.setLongitude(Double.valueOf(longitude));
+                    entity.setLatitude(Double.valueOf(stationLatitude));
+                    entity.setLongitude(Double.valueOf(stationLongitude));
                     rentalDTO.add(entity);
                     System.out.println(rentalDTO.size());
                 }
@@ -79,7 +78,7 @@ public class RentalParser {
     }
 
     private String getURLParam(String search){
-        String url = "http://openapi.seoul.go.kr:8088/6845466350736e773331414a674246/json/bikeList/1/5/";
+        String url = "http://openapi.seoul.go.kr:8088/6845466350736e773331414a674246/json/bikeList/1/1000/";
         return url;
     }
 

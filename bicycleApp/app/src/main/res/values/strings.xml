@@ -1,5 +1,4 @@
 <resources>
     <string name="app_name">bicycleApp</string>
-    <string name = "myAppName">"따르릉 따르릉"</string>
-
+    <string name="action_search">Search</string>
 </resources>

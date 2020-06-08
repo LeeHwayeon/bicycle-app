@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -12,7 +14,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.UiThread;
-import androidx.fragment.app.FragmentActivity;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.LocationTrackingMode;
@@ -29,13 +32,14 @@ import java.util.ArrayList;
 
 
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     NaverMap map;
     Switch roadSwitch;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     private FusedLocationSource locationSource;
+
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -44,6 +48,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         StrictMode.enableDefaults();
+
 
         //자전거 도로
         roadSwitch = (Switch) findViewById(R.id.roadSwitch);
@@ -75,15 +80,37 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         //자전거 사고정보
         setUpAccidentMap();
 
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
         //자전거 대여소 정보
         setUpRentalMap();
 
         //위치
         locationSource = new FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE);
 
+        //툴바
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setBackgroundColor(Color.BLACK);
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.search:
+                return true;
+            case R.id.favorite:
+                return true;
+            case R.id.action_settings:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @UiThread
@@ -102,6 +129,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         UiSettings uiSettings = map.getUiSettings();
         uiSettings.setLocationButtonEnabled(true);  //현위치 버튼
 
+
     }
 
     //자전거 사고 정보
@@ -116,17 +144,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         for(int i=0; i<accidentDTO.size(); i++){
             for(AccidentDTO entity : accidentDTO) {
                 Marker ac_marker = new Marker();
-                LocationOverlay locationOverlay = map.getLocationOverlay();
 
                 ac_marker.setPosition(new LatLng(entity.getLongitude(), entity.getLatitude()));
-
-                ac_marker.setIcon(MarkerIcons.BLACK);
-                ac_marker.setIconTintColor(Color.RED);
-
                 ac_marker.setCaptionText(entity.getAccident());
-                ac_marker.setCaptionTextSize(16);
 
                 ac_marker.setMap(map);
+
             }
         }
     }
