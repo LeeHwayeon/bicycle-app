@@ -1,44 +1,46 @@
 package com.example.bicycleapp;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.annotation.UiThread;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.naver.maps.geometry.LatLng;
-import com.naver.maps.map.LocationTrackingMode;
 import com.naver.maps.map.MapFragment;
 import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
 import com.naver.maps.map.UiSettings;
-import com.naver.maps.map.overlay.LocationOverlay;
 import com.naver.maps.map.overlay.Marker;
 import com.naver.maps.map.util.FusedLocationSource;
-import com.naver.maps.map.util.MarkerIcons;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
-
-@RequiresApi(api = Build.VERSION_CODES.KITKAT)
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
-
-    NaverMap map;
-    Switch roadSwitch;
-
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
+    private static final int ACCESS_LOCATION_PERMISSION_REQUEST_CODE = 100;
     private FusedLocationSource locationSource;
+
+    private NaverMap naverMap;
+    Switch roadSwitch;
+    TextView tv;
+    private Button btnStart, btnEnd;
+
+    Context context;
 
 
     @SuppressLint("SetTextI18n")
@@ -47,7 +49,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        StrictMode.enableDefaults();
+
+        //특정시간에 사고주의알림
+        new AlarmHATT(getApplicationContext()).Alarm();
+
+//        Textiew textView = (TextView)findViewById(R.id.textView);
+//        String resultText = "값이없음";
+//
+//        try {
+//            resultText = new AccidentParser().execute().get();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//        }
+//
+//        textView.setText(resultText);
 
 
         //자전거 도로
@@ -58,40 +75,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if(isChecked == true){
                     Toast.makeText(MainActivity.this, "자전거도로 표시", Toast.LENGTH_SHORT).show();
                     //자전거 도로 표시 on
-                    map.setLayerGroupEnabled(NaverMap.LAYER_GROUP_BICYCLE, true);
+                    naverMap.setLayerGroupEnabled(NaverMap.LAYER_GROUP_BICYCLE, true);
 
                 }
                 else{
                     //자전거 도로 표시 off
-                    map.setLayerGroupEnabled(NaverMap.LAYER_GROUP_BICYCLE, false);
+                    naverMap.setLayerGroupEnabled(NaverMap.LAYER_GROUP_BICYCLE, false);
 
                 }
             }
         });
 
-        //지도 view
-        MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        if (mapFragment == null) {
-            mapFragment = MapFragment.newInstance();
-            getSupportFragmentManager().beginTransaction().add(R.id.map, mapFragment).commit();
-        }
-        mapFragment.getMapAsync(this);
-
-        //자전거 사고정보
+        //자전거 사고다발지역표시
         setUpAccidentMap();
 
-        //자전거 대여소 정보
-        setUpRentalMap();
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
-        //위치
-        locationSource = new FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE);
+        //지도 view
+        MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         //툴바
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setBackgroundColor(Color.BLACK);
 
+
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -113,28 +125,37 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    @UiThread
     @Override
-    public void onMapReady(@NonNull NaverMap naverMap) {
-        map = naverMap;
+    public void onMapReady(@NonNull final NaverMap naverMap) {
+        this.naverMap = naverMap;
 
-        //위치설정
-        map.setLocationSource(locationSource);
+        //사용자에게 먼저 위치 정보를 허용할지 물어봄
+        locationSource = new FusedLocationSource(this, ACCESS_LOCATION_PERMISSION_REQUEST_CODE);
+        naverMap.setLocationSource(locationSource);
+        UiSettings uiSettings = naverMap.getUiSettings();
+        //현위치 ui
+        uiSettings.setLocationButtonEnabled(true);
 
-        //위치 오버레이 설정
-        LocationOverlay locationOverlay = map.getLocationOverlay();
-        locationOverlay.setVisible(true);
-
-        //사용자 인터페이스
-        UiSettings uiSettings = map.getUiSettings();
-        uiSettings.setLocationButtonEnabled(true);  //현위치 버튼
-
+        Marker marker = new Marker();
+        marker.setPosition(new LatLng(37.5670135, 126.9783740));
+        marker.setMap(naverMap);
 
     }
 
+    public void onRequestPermissionResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode){
+            case ACCESS_LOCATION_PERMISSION_REQUEST_CODE:
+                locationSource.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                return;
+        }
+    }
+
+
     //자전거 사고 정보
     public void setUpAccidentMap() {
-        AccidentParser parser = new AccidentParser();
+        parser parser = new parser();
         ArrayList<AccidentDTO> accidentDTO = new ArrayList<AccidentDTO>();
         try {
             accidentDTO = parser.apiParserSearch();
@@ -148,51 +169,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ac_marker.setPosition(new LatLng(entity.getLongitude(), entity.getLatitude()));
                 ac_marker.setCaptionText(entity.getAccident());
 
-                ac_marker.setMap(map);
-
+                ac_marker.setMap(naverMap);
             }
         }
     }
 
-    //자전거 대여소 정보
-    public void setUpRentalMap() {
-        RentalParser parser = new RentalParser();
-        ArrayList<RentalDTO> rentalDTO = new ArrayList<RentalDTO>();
-        try {
-            rentalDTO = parser.apiParserSearch();
-        } catch (Exception e) {
-            e.printStackTrace();
+    //알림
+    public class AlarmHATT {
+        private Context context;
+
+        public AlarmHATT(Context context) {
+            this.context = context;
         }
-        for(int i=0; i<rentalDTO.size(); i++){
-            for(RentalDTO entity : rentalDTO) {
-                Marker re_marker = new Marker();
-                LocationOverlay locationOverlay = map.getLocationOverlay();
 
-                re_marker.setPosition(new LatLng(entity.getLongitude(), entity.getLatitude()));
+        public void Alarm() {
+            AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(MainActivity.this, BroadcastD.class);
 
-                re_marker.setIcon(MarkerIcons.BLACK);
-                re_marker.setIconTintColor(Color.BLUE);
+            PendingIntent sender = PendingIntent.getBroadcast(MainActivity.this, 0, intent, 0);
 
-                re_marker.setCaptionText(entity.getStationName());
-                re_marker.setCaptionTextSize(16);
+            Calendar calendar = Calendar.getInstance();
 
-                re_marker.setMap(map);
-            }
+            //사고많은 6시 퇴근시간에 알림창 띄우기
+            calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 18, 0, 0);
+
+            //알람 예약
+            am.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender);
         }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,  @NonNull int[] grantResults) {
-        if (locationSource.onRequestPermissionsResult(
-                requestCode, permissions, grantResults)) {
-            if (!locationSource.isActivated()) { // 권한 거부됨
-                map.setLocationTrackingMode(LocationTrackingMode.None);
-            }
-            return;
-        }
-        super.onRequestPermissionsResult(
-                requestCode, permissions, grantResults);
     }
 
 }

@@ -1,90 +1,108 @@
 package com.example.bicycleapp;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
+import android.os.AsyncTask;
+import android.util.Log;
 
-import java.io.BufferedInputStream;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 
-public class AccidentParser {
+//json 파싱
+public class AccidentParser extends AsyncTask<String, Void, String> {
 
-    private static String APIkey = "i7hUwTM8Zfmbt9KD8A%2Bgeh1N61Yl%2FY50rxRFI%2BiR0psYWixhym4%2BfpIKX0hiAB%2Fs";
+    String clientKey = "i7hUwTM8Zfmbt9KD8A%2Bgeh1N61Yl%2FY50rxRFI%2BiR0psYWixhym4%2BfpIKX0hiAB%2Fs";    private String str, receiveMsg;
 
-    public AccidentParser(){
+    @Override
+    protected String doInBackground(String... params) {
+        URL url = null;
         try {
-            apiParserSearch();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
+            url = new URL("http://taas.koroad.or.kr/data/rest/frequentzone/bicycle?authKey="+clientKey+
+                    "&searchYearCd=2019038&sido=11&guGun=680&type=json");
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+            conn.setRequestProperty("x-waple-authorization", clientKey);
+
+            if (conn.getResponseCode() == conn.HTTP_OK) {
+                InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
+                BufferedReader reader = new BufferedReader(tmp);
+                StringBuffer buffer = new StringBuffer();
+                while ((str = reader.readLine()) != null) {
+                    buffer.append(str);
+                }
+                receiveMsg = buffer.toString();
+                Log.i("receiveMsg : ", receiveMsg);
+
+                reader.close();
+            } else {
+                Log.i("통신 결과", conn.getResponseCode() + "에러");
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
-    public ArrayList<AccidentDTO> apiParserSearch() throws Exception {
-        URL url = new URL(getURLAccident(null));
+        String spot_nm = ""; //다발지역 지점의 위치
+        String occrrnc_cnt = ""; //발생건수
+        String dth_dnv_cnt = ""; //사망자수
+        String lo_crd = ""; //경도
+        String la_crd = ""; //위도
 
-        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        XmlPullParser xpp = factory.newPullParser();
-        BufferedInputStream bis = new BufferedInputStream(url.openStream());
-        xpp.setInput(bis, "utf-8");
+//        List<String> spot_nm = new ArrayList<>();
+//        List<Integer> occrrnc_cnt = new ArrayList<>();
+//        List<Integer> dth_dnv_cnt = new ArrayList<>();
+//        List<Double> la_crd = new ArrayList<>();
+//        List<Double> lo_crd = new ArrayList<>();
 
-        String tag = null;
-        int event_type = xpp.getEventType();
 
-        ArrayList<AccidentDTO> accidentDTO = new ArrayList<AccidentDTO>();
+        String[] accidentarr = new String[5];
+        try {
 
-        String occrrnc_cnt = null, la_crd= null, lo_crd=null;
-        boolean boccrrnc_cnt = false, bla_crd = false, blo_crd = false;
+//            ArrayList<AccidentParser> accidentParsers = new ArrayList<>();
 
-        while (event_type != XmlPullParser.END_DOCUMENT) {
-            if (event_type == XmlPullParser.START_TAG) {
-                tag = xpp.getName();
-                if(tag.equals("occrrnc_cnt")){
-                    boccrrnc_cnt = true;
-                }else if(tag.equals("la_crd")){
-                    bla_crd = true;
-                }else if(tag.equals("lo_crd")){
-                    blo_crd = true;
-                }
-            } else if (event_type == XmlPullParser.TEXT) {
-                if (boccrrnc_cnt == true) {
-                    occrrnc_cnt = xpp.getText();
-                    boccrrnc_cnt = false;
-                } else if (bla_crd == true) {
-                    la_crd = xpp.getText();
-                    bla_crd = false;
-                } else if (blo_crd == true) {
-                    lo_crd = xpp.getText();
-                    blo_crd = false;
-                }
-            }else if(event_type == XmlPullParser.END_TAG){
-                tag = xpp.getName();
-                if (tag.equals("item")) {
-                    AccidentDTO entity = new AccidentDTO();
-                    entity.setAccident(occrrnc_cnt);
-                    entity.setLatitude(Double.valueOf(la_crd));
-                    entity.setLongitude(Double.valueOf(lo_crd));
-                    accidentDTO.add(entity);
-                    System.out.println(accidentDTO.size());
-                }
-            }
-            event_type = xpp.next();
+            JSONObject jsonObject = new JSONObject(receiveMsg).getJSONObject("items");
+            JSONArray jsonArray = jsonObject.getJSONArray("item");
+
+            Log.i("넘어온 결과1", String.valueOf(jsonObject));
+            Log.i("넘어온 결과2", String.valueOf(jsonArray));
+
+//            for(int i=0; i<jsonArray.length(); i++){
+//                JSONObject accident = jsonArray.getJSONObject(i);
+//
+//                String addr = accident.getString("spot_nm");
+//                Integer sago = accident.getInt("occrrnc_cnt");
+//                Integer death = accident.getInt("dth_dnv_cnt");
+//                Double latitude = accident.getDouble("la_crd"); //String sLAT = subJsonObject.getString("latitude");
+//                Double longitude = accident.getDouble("lo_crd"); //String sLNG = subJsonObject.getString("longitude");
+//
+//                spot_nm.add(accident.getString("spot_nm"));
+//                occrrnc_cnt.add(accident.getInt("occrrnc_cnt"));
+//                dth_dnv_cnt.add(accident.getInt("dth_dnv_cnt"));
+//                la_crd.add(accident.getDouble("la_crd"));
+//                lo_crd.add(accident.getDouble("lo_crd"));
+//
+//            }
+
+            spot_nm = jsonArray.getJSONObject(0).getString("spot_nm");
+            occrrnc_cnt = jsonArray.getJSONObject(0).getString("occrrnc_cnt");
+            dth_dnv_cnt = jsonArray.getJSONObject(0).getString("dth_dnv_cnt");
+            lo_crd = jsonArray.getJSONObject(0).getString("lo_crd");
+            la_crd = jsonArray.getJSONObject(0).getString("la_crd");
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        System.out.println(accidentDTO.size());
-        System.out.println(accidentDTO);
-        return accidentDTO;
+        final String msg = "위치:" + spot_nm + "\n사고건수: " + occrrnc_cnt + "\n사망자수" + dth_dnv_cnt +
+                "\n경도: " + lo_crd + "\n위도: " + la_crd;
+        return msg;
     }
-
-
-    private String getURLAccident(String search){
-        String url = "http://taas.koroad.or.kr/data/rest/frequentzone/bicycle?authKey=i7hUwTM8Zfmbt9KD8A%2Bgeh1N61Yl%2FY50rxRFI%2BiR0psYWixhym4%2BfpIKX0hiAB%2Fs&searchYearCd=2018&siDo=11&guGun=680&type=xml";
-        return url;
-    }
-
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
-        new AccidentParser();
-    }
-
 }
