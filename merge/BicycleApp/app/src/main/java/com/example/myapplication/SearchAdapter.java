@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.List;
 
 public class SearchAdapter extends BaseAdapter {
+
     private Context context;
     private List<String> list;
     private LayoutInflater inflate;
@@ -39,7 +40,7 @@ public class SearchAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup viewGroup) {
         if(convertView == null){
-            convertView = inflate.inflate(R.layout.listview_short,null);
+            convertView = inflate.inflate(R.layout.row_listview,null);
 
             viewHolder = new ViewHolder();
             viewHolder.label = (TextView) convertView.findViewById(R.id.label);
@@ -58,4 +59,5 @@ public class SearchAdapter extends BaseAdapter {
     class ViewHolder{
         public TextView label;
     }
+
 }

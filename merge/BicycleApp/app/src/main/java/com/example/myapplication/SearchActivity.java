@@ -2,37 +2,19 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
+import android.text.TextWatcher;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
-
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.TextView;
-import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class SearchActivity extends AppCompatActivity {
 
@@ -42,10 +24,15 @@ public class SearchActivity extends AppCompatActivity {
     private SearchAdapter adapter;      // 리스트뷰에 연결할 아답터
     private ArrayList<String> arraylist;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_search);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setBackgroundColor(Color.BLACK);
 
         editSearch = (EditText) findViewById(R.id.editSearch);
         listView = (ListView) findViewById(R.id.listView);
@@ -86,7 +73,34 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
+    }
 
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case R.id.favorite:
+                Toast.makeText(this, "즐겨찾기", Toast.LENGTH_SHORT).show();
+                Intent favorite = new Intent(SearchActivity.this, FavoritActivity.class);
+                startActivity(favorite);
+                return true;
+            case R.id.home:
+                Toast.makeText(this, "홈", Toast.LENGTH_SHORT).show();
+                Intent home= new Intent(SearchActivity.this, MainActivity.class);
+                startActivity(home);
+                return true;
+            case R.id.search:
+                Toast.makeText(this, "검색", Toast.LENGTH_SHORT).show();
+                Intent search = new Intent(SearchActivity.this, SearchActivity.class);
+                startActivity(search);
+                return true;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
     }
 
     // 검색을 수행하는 메소드
@@ -119,34 +133,18 @@ public class SearchActivity extends AppCompatActivity {
 
     // 검색에 사용될 데이터를 리스트에 추가한다.
     private void settingList(){
-        list.add("채수빈");
-        list.add("박지현");
-        list.add("수지");
-        list.add("남태현");
-        list.add("하성운");
-        list.add("크리스탈");
-        list.add("강승윤");
-        list.add("손나은");
-        list.add("남주혁");
-        list.add("루이");
-        list.add("진영");
-        list.add("슬기");
-        list.add("이해인");
-        list.add("고원희");
-        list.add("설리");
-        list.add("공명");
-        list.add("김예림");
-        list.add("혜리");
-        list.add("웬디");
-        list.add("박혜수");
-        list.add("카이");
-        list.add("진세연");
-        list.add("동호");
-        list.add("박세완");
-        list.add("도희");
-        list.add("창모");
-        list.add("허영지");
+        list.add("서울숲관리사무소자전거대여소");
+        list.add("뚝섬유원지역1번출구앞자전거대여소");
+        list.add("여의도역4번출구옆자전거대여소");
+        list.add("합정역5번출구앞자전거대여소");
+        list.add("시청역1번출구뒤자전거대여소");
+        list.add("서초4동주민센터자전거대여소");
+        list.add("노들역1번출구자전대여소");
+        list.add("으뜸공원자전거대여소");
+        list.add("양서중학교옆자전거대여소");
+        list.add("양카라공원앞자전거대여소");
+        list.add("합정역5번출구앞자전거대여소");
+        list.add("베르가모앞자전거대여소");
+        list.add("마포어린이공원자전거대여");
     }
-
-}
-
+    }
