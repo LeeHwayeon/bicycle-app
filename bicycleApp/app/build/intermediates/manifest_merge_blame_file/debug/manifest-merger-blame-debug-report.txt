@@ -1,0 +1,143 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.bicycleapp"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="19"
+8-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml
+9        android:targetSdkVersion="29" />
+9-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:5:5-67
+11-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:5:22-64
+12    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+12-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:6:5-79
+12-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:6:22-76
+13    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+13-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:7:5-81
+13-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:7:22-78
+14    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+14-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:8:5-79
+14-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:8:22-76
+15    //알림림
+16    <uses-permission android:name="android.permission.VIBRATE" />
+16-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:11:4-65
+16-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:11:21-62
+17    <uses-permission android:name="android.permission.WAKE_LOCK" />
+17-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:12:5-68
+17-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:12:22-65
+18
+19    <uses-feature
+19-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:11:5-13:35
+20        android:glEsVersion="0x00020000"
+20-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:12:9-41
+21        android:required="true" />
+21-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:13:9-32
+22    <uses-feature
+22-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:14:5-16:36
+23        android:name="android.hardware.wifi"
+23-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:15:9-45
+24        android:required="false" />
+24-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:16:9-33
+25
+26    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+26-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:20:5-76
+26-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:20:22-73
+27
+28    <application
+28-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:14:5-35:19
+29        android:allowBackup="true"
+29-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:15:9-35
+30        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+30-->[androidx.core:core:1.1.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\b2b51ad2129f7ae88186ad90508b79ab\core-1.1.0\AndroidManifest.xml:24:18-86
+31        android:debuggable="true"
+32        android:icon="@mipmap/ic_launcher"
+32-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:16:9-43
+33        android:label="@string/app_name"
+33-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:17:9-41
+34        android:roundIcon="@mipmap/ic_launcher_round"
+34-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:18:9-54
+35        android:supportsRtl="true"
+35-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:19:9-35
+36        android:testOnly="true"
+37        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+37-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:20:9-65
+38        android:usesCleartextTraffic="true" >
+38-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:21:9-44
+39        <meta-data
+39-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:23:9-25:42
+40            android:name="com.naver.maps.map.CLIENT_ID"
+40-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:24:13-56
+41            android:value="9eysa9fxs7" />
+41-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:25:13-39
+42
+43        <activity android:name="com.example.bicycleapp.MainActivity" >
+43-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:27:9-33:20
+43-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:27:19-47
+44            <intent-filter>
+44-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:28:13-32:29
+45                <action android:name="android.intent.action.MAIN" />
+45-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:29:17-69
+45-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:29:25-66
+46
+47                <category android:name="android.intent.category.LAUNCHER" />
+47-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:31:17-77
+47-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:31:27-74
+48            </intent-filter>
+49        </activity>
+50
+51        <receiver android:name="com.example.bicycleapp.BroadcastD" />
+51-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:34:9-57
+51-->C:\Users\snw40\Desktop\bicycle_App\bicycleApp\app\src\main\AndroidManifest.xml:34:19-45
+52
+53        <activity
+53-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:23:9-27:51
+54            android:name="com.naver.maps.map.app.LegendActivity"
+54-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:24:13-65
+55            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+55-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:25:13-91
+56            android:label="@string/navermap_legend"
+56-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:26:13-52
+57            android:theme="@style/navermap_app" />
+57-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:27:13-48
+58        <activity
+58-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:28:9-32:51
+59            android:name="com.naver.maps.map.app.LegalNoticeActivity"
+59-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:29:13-70
+60            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+60-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:30:13-91
+61            android:label="@string/navermap_legal_notice"
+61-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:31:13-58
+62            android:theme="@style/navermap_app" />
+62-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:32:13-48
+63        <activity
+63-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:33:9-37:51
+64            android:name="com.naver.maps.map.app.OpenSourceLicenseActivity"
+64-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:34:13-76
+65            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+65-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:35:13-91
+66            android:label="@string/navermap_open_source_license"
+66-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:36:13-65
+67            android:theme="@style/navermap_app" />
+67-->[com.naver.maps:map-sdk:3.8.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\8c962a65296d57e2f13571fbb6eda0a5\jetified-map-sdk-3.8.0\AndroidManifest.xml:37:13-48
+68        <activity
+68-->[com.google.android.gms:play-services-base:17.0.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\d7df73591dc571468c186fdd2a992bad\jetified-play-services-base-17.0.0\AndroidManifest.xml:23:9-26:75
+69            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+69-->[com.google.android.gms:play-services-base:17.0.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\d7df73591dc571468c186fdd2a992bad\jetified-play-services-base-17.0.0\AndroidManifest.xml:24:13-79
+70            android:exported="false"
+70-->[com.google.android.gms:play-services-base:17.0.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\d7df73591dc571468c186fdd2a992bad\jetified-play-services-base-17.0.0\AndroidManifest.xml:25:13-37
+71            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+71-->[com.google.android.gms:play-services-base:17.0.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\d7df73591dc571468c186fdd2a992bad\jetified-play-services-base-17.0.0\AndroidManifest.xml:26:13-72
+72
+73        <meta-data
+73-->[com.google.android.gms:play-services-basement:17.0.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\ad072bd06501b4ced252e97ed9ee745e\jetified-play-services-basement-17.0.0\AndroidManifest.xml:23:9-25:69
+74            android:name="com.google.android.gms.version"
+74-->[com.google.android.gms:play-services-basement:17.0.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\ad072bd06501b4ced252e97ed9ee745e\jetified-play-services-basement-17.0.0\AndroidManifest.xml:24:13-58
+75            android:value="@integer/google_play_services_version" />
+75-->[com.google.android.gms:play-services-basement:17.0.0] C:\Users\snw40\.gradle\caches\transforms-2\files-2.1\ad072bd06501b4ced252e97ed9ee745e\jetified-play-services-basement-17.0.0\AndroidManifest.xml:25:13-66
+76    </application>
+77
+78</manifest>
