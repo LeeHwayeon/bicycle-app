@@ -48,8 +48,7 @@ public class RegisterActivity extends AppCompatActivity {
         btn_register = findViewById(R.id.btn_register);
         spinner1 = (Spinner)findViewById(R.id.spinner1);
         spinner2 = (Spinner)findViewById(R.id.spinner2);
-        final TextView tv_age = (TextView)findViewById(R.id.tv_age);
-        final TextView tv_gu = (TextView)findViewById(R.id.tv_gu);
+
 
         ArrayAdapter spinnerAdapter1;
         spinnerAdapter1 = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, getResources().getStringArray(R.array.age));
@@ -95,7 +94,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        // 회원가입 버튼 클릭 시 수행행
+        // 회원가입 버튼 클릭 시 수행
        btn_register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

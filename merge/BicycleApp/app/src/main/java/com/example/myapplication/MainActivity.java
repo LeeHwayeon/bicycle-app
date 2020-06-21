@@ -3,15 +3,26 @@ package com.example.myapplication;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +39,20 @@ import com.naver.maps.map.UiSettings;
 import com.naver.maps.map.overlay.Marker;
 import com.naver.maps.map.util.FusedLocationSource;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
@@ -37,10 +61,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private NaverMap naverMap;
     Switch roadSwitch;
-    private Button btnStart, btnEnd;
-    private TextView tv_id, tv_pass, tv_gender, tv_age, tv_gu;
 
     Context context;
+
+    private static String TAG = "myapplication_MainActivity";
+
+    private static final String TAG_JSON="webnautes";
+    private static final String TAG_ADDRESS = "address";
+    private static final String TAG_SAGOGUNSU = "sagogunsu";
+    private static final String TAG_SAMANGJASU ="samangjasu";
+    private static final String TAG_LONGITUDE="longitude";
+    private static final String TAG_LATITUDE ="latitude";
+
+    private TextView mTextViewResult;
+    ArrayList<HashMap<String, String>> mArrayList;
+    ListView mlistView;
+    String mJsonString;
+
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -49,41 +86,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tv_id = findViewById(R.id.tv_id);
-        tv_pass = findViewById(R.id.tv_pass);
-        tv_gender = findViewById(R.id.tv_gender);
-        tv_age = findViewById(R.id.tv_age);
-        tv_gu = findViewById(R.id.tv_gu);
+        mTextViewResult = (TextView)findViewById(R.id.textView_main_result);
+        mTextViewResult.setVisibility(View.INVISIBLE);
+        mlistView = (ListView) findViewById(R.id.listView_main_list);
+        mArrayList = new ArrayList<>();
 
-        Intent intent = getIntent();
-        String userID = intent.getStringExtra("userID");
-        String userPassword = intent.getStringExtra("userPassword");
-        String userGender = intent.getStringExtra("userGender");
-        String userAge = intent.getStringExtra("userAge");
-        String userGu = intent.getStringExtra("userGu");
 
-        tv_id.setText(userID);
-        tv_pass.setText(userPassword);
-        tv_gender.setText(userGender);
-        tv_age.setText(userAge);
-        tv_gu.setText(userGu);
-
+        GetData task = new GetData();
+        task.execute("http://congping2.dothome.co.kr/bb.php");
 
         //특정시간에 사고주의알림
         new AlarmHATT(getApplicationContext()).Alarm();
 
-        TextView textView = (TextView)findViewById(R.id.textView);
-        String resultText = "값이없음";
-
-        try {
-            resultText = new AccidentParser().execute().get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        textView.setText(resultText);
+//        TextView textView = (TextView)findViewById(R.id.textView);
+//        String resultText = "값이없음";
+//
+//        try {
+//            resultText = new AccidentParser().execute().get();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//        }
+//
+//        textView.setText(resultText);
 
 
         //자전거 도로
@@ -123,6 +149,132 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    private class GetData extends AsyncTask<String, Void, String> {
+        ProgressDialog progressDialog;
+        String errorString = null;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = ProgressDialog.show(MainActivity.this,
+                    "Please Wait", null, true, true);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            progressDialog.dismiss();
+            mTextViewResult.setText(result);
+            Log.d(TAG, "response  - " + result);
+
+            if (result == null){
+
+                mTextViewResult.setText(errorString);
+            }
+            else {
+
+                mJsonString = result;
+                showResult();
+            }
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String serverURL = params[0];
+
+            try {
+                URL url = new URL(serverURL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setReadTimeout(5000);
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.connect();
+
+                int responseStatusCode = httpURLConnection.getResponseCode();
+                Log.d(TAG, "response code - " + responseStatusCode);
+
+                InputStream inputStream;
+                if(responseStatusCode == HttpURLConnection.HTTP_OK) {
+                    inputStream = httpURLConnection.getInputStream();
+                }
+                else{
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                StringBuilder sb = new StringBuilder();
+                String line;
+
+                while((line = bufferedReader.readLine()) != null){
+                    sb.append(line);
+                }
+
+
+                bufferedReader.close();
+
+
+                return sb.toString().trim();
+
+
+            } catch (Exception e) {
+
+                Log.d(TAG, "InsertData: Error ", e);
+                errorString = e.toString();
+
+                return null;
+            }
+
+        }
+    }
+
+
+    private void showResult(){
+        try {
+            JSONObject jsonObject = new JSONObject(mJsonString);
+            JSONArray jsonArray = jsonObject.getJSONArray(TAG_JSON);
+
+            for(int i=0;i<jsonArray.length();i++){
+
+                JSONObject item = jsonArray.getJSONObject(i);
+
+                String address = item.getString(TAG_ADDRESS);
+                String sagogunsu = item.getString(TAG_SAGOGUNSU);
+                String samangjasu = item.getString(TAG_SAMANGJASU);
+                String longitude = item.getString(TAG_LONGITUDE);
+                String latitude = item.getString(TAG_LATITUDE);
+
+                HashMap<String,String> hashMap = new HashMap<>();
+
+                hashMap.put(TAG_ADDRESS, address);
+                hashMap.put(TAG_SAGOGUNSU, sagogunsu);
+                hashMap.put(TAG_SAMANGJASU, samangjasu);
+                hashMap.put(TAG_LONGITUDE, longitude);
+                hashMap.put(TAG_LATITUDE, latitude);
+
+                mArrayList.add(hashMap);
+            }
+
+            ListAdapter adapter = new SimpleAdapter(
+                    MainActivity.this, mArrayList, R.layout.item_list,
+                    new String[]{TAG_ADDRESS,TAG_SAGOGUNSU, TAG_SAMANGJASU, TAG_LONGITUDE,TAG_LATITUDE},
+                    new int[]{R.id.list_address, R.id.list_sago, R.id.list_samang, R.id.list_long, R.id.list_lat}
+
+            );
+
+            mlistView.setAdapter(adapter);
+
+        } catch (JSONException e) {
+
+            Log.d(TAG, "showResult : ", e);
+        }
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -131,17 +283,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
-            case R.id.search:
-                return true;
             case R.id.favorite:
+                Toast.makeText(this, "즐겨찾기", Toast.LENGTH_SHORT).show();
+                Intent favorite = new Intent(MainActivity.this, FavoriteActivity.class);
+                startActivity(favorite);
                 return true;
-            case R.id.action_settings:
+            case R.id.search:
+                Toast.makeText(this, "검색", Toast.LENGTH_SHORT).show();
+                Intent search = new Intent(MainActivity.this, SearchActivity.class);
+                startActivity(search);
                 return true;
-            default:
-                return super.onOptionsItemSelected(item);
+            case R.id.weather:
+                Toast.makeText(this, "날씨", Toast.LENGTH_SHORT).show();
+                Intent weather= new Intent(MainActivity.this, WeatherActivity.class);
+                startActivity(weather);
+                return true;
+            case R.id.home:
+                Toast.makeText(this, "홈", Toast.LENGTH_SHORT).show();
+                Intent home= new Intent(this, MainActivity.class);
+                startActivity(home);
+                return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -217,6 +382,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             am.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender);
         }
     }
+
 
 
 

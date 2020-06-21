@@ -23,16 +23,20 @@
             android:name="com.naver.maps.map.CLIENT_ID"
             android:value="9eysa9fxs7" />
 
-        <activity android:name="com.example.myapplication.LoginActivity">
+        <activity android:name="com.example.myapplication.IntroActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.example.myapplication.LoginActivity" />
         <receiver android:name="com.example.myapplication.BroadcastD"></receiver>
         <activity android:name="com.example.myapplication.RegisterActivity" />
         <activity android:name="com.example.myapplication.MainActivity"/>
+        <activity android:name="com.example.myapplication.SearchActivity"/>
+        <activity android:name="com.example.myapplication.FavoriteActivity"/>
+        <activity android:name="com.example.myapplication.WeatherActivity"/>
+
 
     </application>
 
