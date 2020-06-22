@@ -19,6 +19,31 @@
             app:popupTheme="@style/AppTheme.PopupOverlay"
             />
 
+        <TextView
+            android:id="@+id/GpsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textStyle="bold"
+            android:textColor="#04aa4b"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"/>
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id = "@+id/tv_WeatherInfo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="#04aa4b"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"/>
+
+        </ScrollView>
+
     </com.google.android.material.appbar.AppBarLayout>
 
 

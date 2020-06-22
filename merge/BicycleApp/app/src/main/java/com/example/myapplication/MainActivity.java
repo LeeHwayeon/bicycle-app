@@ -355,9 +355,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     handler.post(() -> {
                         // 메인 스레드
-                        for (Marker marker : markers_list) {
-                            marker.setMap(naverMap);
-                        }
+
                     });
 
 
@@ -439,6 +437,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Marker samplemarker = new Marker();
         samplemarker.setPosition(new LatLng(37.5670135, 126.9783740));
         samplemarker.setMap(naverMap);
+
+        for (Marker marker : markers_list) {
+            marker.setMap(naverMap);
+        }
 
     }
 
