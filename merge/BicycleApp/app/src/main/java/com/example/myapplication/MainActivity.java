@@ -37,8 +37,10 @@ import com.naver.maps.map.MapFragment;
 import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
 import com.naver.maps.map.UiSettings;
+import com.naver.maps.map.overlay.InfoWindow;
 import com.naver.maps.map.overlay.Marker;
 import com.naver.maps.map.util.FusedLocationSource;
+import com.naver.maps.map.util.MarkerIcons;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -78,21 +80,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private TextView mTextViewResult;
     ArrayList<HashMap<String, String>> mArrayList;
-    ListView mlistView;
     String mJsonString;
 
     double latitudeValue;
     double longitudeValue;
 
 
-    // php 서버로 부터 받아온 데이터를 저장할 리스트
+    // php 서버로 부터 받아온 사고 데이터를 저장할 리스트
     ArrayList<Double> lat_list;
     ArrayList<Double> lng_list;
     ArrayList<String> address_list;
     ArrayList<String> sago_list;
-    // 지도의 표시한 마커(주변장소표시)를 관리하는 객체를 담을 리스트
+    ArrayList<String> samang_list;
+    //사고 마커를 관리하는 객체를 담을 리스트
     ArrayList<Marker> markers_list;
-    Handler handler = new Handler(Looper.getMainLooper());
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -112,12 +113,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        mTextViewResult = (TextView)findViewById(R.id.textView_main_result);
+        mTextViewResult = (TextView) findViewById(R.id.textView_main_result);
         mTextViewResult.setVisibility(View.INVISIBLE);
-        mlistView = (ListView) findViewById(R.id.listView_main_list);
         mArrayList = new ArrayList<>();
-
-
 
 
         //특정시간에 사고주의알림
@@ -136,11 +134,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         textView.setText(resultText);
 
-        lat_list=new ArrayList<>();
-        lng_list=new ArrayList<>();
-        address_list=new ArrayList<>();
-        sago_list=new ArrayList<>();
-        markers_list=new ArrayList<>();
+        lat_list = new ArrayList<>();
+        lng_list = new ArrayList<>();
+        address_list = new ArrayList<>();
+        sago_list = new ArrayList<>();
+        samang_list = new ArrayList<>();
+        markers_list = new ArrayList<>();
 
 
         //자전거 도로
@@ -167,9 +166,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setSupportActionBar(toolbar);
         toolbar.setBackgroundColor(Color.BLACK);
 
-
     }
 
+    //자전거 사고
     private class GetData extends AsyncTask<String, Void, String> {
         ProgressDialog progressDialog;
         String errorString = null;
@@ -196,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             else {
                 mJsonString = result;
+                //사고 정보 매핑하는 JSON
                 showResult();
             }
         }
@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-
+    //사고정보 매핑
     private void showResult(){
 
         //데이터를 담아놓을 리스트를 초기화한다.
@@ -266,6 +266,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 String longitude = item.getString(TAG_LONGITUDE);
                 String latitude = item.getString(TAG_LATITUDE);
 
+                //위도경도는 숫자로 바꿔줌
                 latitudeValue = Double.parseDouble(latitude); //converting string latitude value to double
                 longitudeValue = Double.parseDouble(longitude); //converting string longitude value to double
 
@@ -274,52 +275,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 lng_list.add(longitudeValue);
                 address_list.add(address);
                 sago_list.add(sagogunsu);
+                samang_list.add(samangjasu);
 
-//                HashMap<String,String> hashMap = new HashMap<>();
-//
-//                hashMap.put(TAG_ADDRESS, address);
-//                hashMap.put(TAG_SAGOGUNSU, sagogunsu);
-//                hashMap.put(TAG_SAMANGJASU, samangjasu);
-//                hashMap.put(TAG_LONGITUDE, longitude);
-//                hashMap.put(TAG_LATITUDE, latitude);
-//
-//                mArrayList.add(hashMap);
             }
-            //마커실행
             showMarker();
-
-            // 지도에 마커를 표시한다.
-            // 지도에 표시되어있는 마커를 모두 제거한다.
-//            for(Marker marker : markers_list){
-//                marker.setMap(null);
-//            }
-//            markers_list.clear();
-//            // 가져온 데이터의 수 만큼 마커 객체를 만들어 표시한다.
-//            for(int i= 0 ; i< lat_list.size() ; i++){
-//                // 값 추출
-//                double lat= lat_list.get(i);
-//                double lng=lng_list.get(i);
-//                String address=address_list.get(i);
-//                String sagogunsu=sago_list.get(i);
-//                // 생성할 마커의 정보를 가지고 있는 객체를 생성
-//                Marker marker = new Marker();
-//                marker.setPosition(new LatLng(lat, lng));
-//
-//                // 마커를 지도에 표시한다.
-//                markers_list.add(marker);
-//                marker.setMap(naverMap);
-//            }
-
-
-//            ListAdapter adapter = new SimpleAdapter(
-//                    MainActivity.this, mArrayList, R.layout.item_list,
-//                    new String[]{TAG_ADDRESS,TAG_SAGOGUNSU, TAG_SAMANGJASU, TAG_LONGITUDE,TAG_LATITUDE},
-//                    new int[]{R.id.list_address, R.id.list_sago, R.id.list_samang, R.id.list_long, R.id.list_lat}
-//
-//            );
-//
-//            mlistView.setAdapter(adapter);
-
         } catch (JSONException e) {
 
             Log.d(TAG, "showResult : ", e);
@@ -333,11 +292,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
-                Executor executor = null;
-                Handler handler = new Handler(Looper.getMainLooper());
-
-
                     // 백그라운드 스레드
                     for(Marker marker : markers_list){
                         marker.setMap(null);
@@ -350,50 +304,36 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         double lng = lng_list.get(i);
                         String address = address_list.get(i);
                         String sagogunsu = sago_list.get(i);
+                        String samangjasu = samang_list.get(i);
+
+
+
                         // 생성할 마커의 정보를 가지고 있는 객체를 생성
                         Marker marker = new Marker();
                         marker.setPosition(new LatLng(lat, lng));
+                        marker.setIcon(MarkerIcons.BLACK);
+                        marker.setIconTintColor(Color.RED);
+                        marker.setWidth(60);
+                        marker.setHeight(80);
 
                         // 마커를 지도에 표시한다.
                         markers_list.add(marker);
+
+//                        InfoWindow infoWindow = new InfoWindow();
+//                        infoWindow.setAdapter(new InfoWindow.DefaultTextAdapter(context) {
+//                            @NonNull
+//                            @Override
+//                            public CharSequence getText(@NonNull InfoWindow infoWindow) {
+//                                String msg = "사고건수 : " + sagogunsu +"\n사망자수 : " + samangjasu;
+//                                return msg;
+//                            }
+//                        });
+//                        infoWindow.open(marker);
                     }
 
-                    handler.post(() -> {
-                        // 메인 스레드
-
-                    });
-
-
-//                // 지도에 마커를 표시한다.
-//                // 지도에 표시되어있는 마커를 모두 제거한다.
-//                for(Marker marker : markers_list){
-//                    marker.setMap(null);
-//                }
-//                markers_list.clear();
-//                // 가져온 데이터의 수 만큼 마커 객체를 만들어 표시한다.
-//                for(int i= 0 ; i< lat_list.size() ; i++){
-//                    // 값 추출
-//                    double lat= lat_list.get(i);
-//                    double lng=lng_list.get(i);
-//                    String address=address_list.get(i);
-//                    String sagogunsu=sago_list.get(i);
-//                    // 생성할 마커의 정보를 가지고 있는 객체를 생성
-//                    Marker marker = new Marker();
-//                    marker.setPosition(new LatLng(lat, lng));
-//
-//                    // 마커를 지도에 표시한다.
-//                    markers_list.add(marker);
-//                    marker.setMap(naverMap);
-//                }
-
-
             }
-
         });
     }
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -439,96 +379,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //현위치 ui
         uiSettings.setLocationButtonEnabled(true);
 
-        Marker samplemarker = new Marker();
-        samplemarker.setPosition(new LatLng(37.5670135, 126.9783740));
-        samplemarker.setMap(naverMap);
-
+        //사고정보 리스트 마커
         for (Marker marker : markers_list) {
             marker.setMap(naverMap);
         }
 
-//        // 카메라 초기 위치 설정
-//        LatLng initialPosition = new LatLng(37.5670135, 126.9783740);
-//        CameraUpdate cameraUpdate = CameraUpdate.scrollTo(initialPosition);
-//        naverMap.moveCamera(cameraUpdate);
-//
-//        // 마커들 위치 정의 (대충 1km 간격 동서남북 방향으로 만개씩, 총 4만개)
-//        markersPosition = new Vector<LatLng>();
-//        for (int x = 0; x < 100; ++x) {
-//            for (int y = 0; y < 100; ++y) {
-//                markersPosition.add(new LatLng(
-//                        initialPosition.latitude - (REFERANCE_LAT * x),
-//                        initialPosition.longitude + (REFERANCE_LNG * y)
-//                ));
-//                markersPosition.add(new LatLng(
-//                        initialPosition.latitude + (REFERANCE_LAT * x),
-//                        initialPosition.longitude - (REFERANCE_LNG * y)
-//                ));
-//                markersPosition.add(new LatLng(
-//                        initialPosition.latitude + (REFERANCE_LAT * x),
-//                        initialPosition.longitude + (REFERANCE_LNG * y)
-//                ));
-//                markersPosition.add(new LatLng(
-//                        initialPosition.latitude - (REFERANCE_LAT * x),
-//                        initialPosition.longitude - (REFERANCE_LNG * y)
-//                ));
-//            }
-//        }
-//
-//        // 카메라 이동 되면 호출 되는 이벤트
-//        naverMap.addOnCameraChangeListener(new NaverMap.OnCameraChangeListener() {
-//            @Override
-//            public void onCameraChange(int reason, boolean animated) {
-//                freeActiveMarkers();
-//                // 정의된 마커위치들중 가시거리 내에있는것들만 마커 생성
-//                LatLng currentPosition = getCurrentPosition(naverMap);
-//                for (LatLng markerPosition: markersPosition) {
-//                    if (!withinSightMarker(currentPosition, markerPosition))
-//                        continue;
-//                    for (Marker marker : markers_list) {
-//                        marker.setPosition(markerPosition);
-//                        marker.setMap(naverMap);
-//                        activeMarkers.add(marker);
-//
-//                    }
-//                }
-//            }
-//        });
-//
+
     }
 
-//    // 마커 정보 저장시킬 변수들 선언
-//    private Vector<LatLng> markersPosition;
-//    private Vector<Marker> activeMarkers;
-//
-//    // 현재 카메라가 보고있는 위치
-//    public LatLng getCurrentPosition(NaverMap naverMap) {
-//        CameraPosition cameraPosition = naverMap.getCameraPosition();
-//        return new LatLng(cameraPosition.target.latitude, cameraPosition.target.longitude);
-//    }
-//
-//    // 선택한 마커의 위치가 가시거리(카메라가 보고있는 위치 반경 3km 내)에 있는지 확인
-//    public final static double REFERANCE_LAT = 1 / 109.958489129649955;
-//    public final static double REFERANCE_LNG = 1 / 88.74;
-//    public final static double REFERANCE_LAT_X3 = 3 / 109.958489129649955;
-//    public final static double REFERANCE_LNG_X3 = 3 / 88.74;
-//    public boolean withinSightMarker(LatLng currentPosition, LatLng markerPosition) {
-//        boolean withinSightMarkerLat = Math.abs(currentPosition.latitude - markerPosition.latitude) <= REFERANCE_LAT_X3;
-//        boolean withinSightMarkerLng = Math.abs(currentPosition.longitude - markerPosition.longitude) <= REFERANCE_LNG_X3;
-//        return withinSightMarkerLat && withinSightMarkerLng;
-//    }
-//
-//    // 지도상에 표시되고있는 마커들 지도에서 삭제
-//    private void freeActiveMarkers() {
-//        if (activeMarkers == null) {
-//            activeMarkers = new Vector<Marker>();
-//            return;
-//        }
-//        for (Marker activeMarker: activeMarkers) {
-//            activeMarker.setMap(null);
-//        }
-//        activeMarkers = new Vector<Marker>();
-//    }
 
     public void onRequestPermissionResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

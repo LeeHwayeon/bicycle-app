@@ -19,12 +19,14 @@
             app:popupTheme="@style/AppTheme.PopupOverlay"
             />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/text1"
+            android:text="Text1" />
+
     </com.google.android.material.appbar.AppBarLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/text1"
-        android:text="Text1" />
+
 
 </RelativeLayout>
