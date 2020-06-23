@@ -37,8 +37,10 @@ import com.naver.maps.map.MapFragment;
 import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
 import com.naver.maps.map.UiSettings;
+import com.naver.maps.map.overlay.Align;
 import com.naver.maps.map.overlay.InfoWindow;
 import com.naver.maps.map.overlay.Marker;
+import com.naver.maps.map.overlay.OverlayImage;
 import com.naver.maps.map.util.FusedLocationSource;
 import com.naver.maps.map.util.MarkerIcons;
 
@@ -85,13 +87,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     double latitudeValue;
     double longitudeValue;
 
-
     // php 서버로 부터 받아온 사고 데이터를 저장할 리스트
     ArrayList<Double> lat_list;
     ArrayList<Double> lng_list;
-    ArrayList<String> address_list;
     ArrayList<String> sago_list;
-    ArrayList<String> samang_list;
+
     //사고 마커를 관리하는 객체를 담을 리스트
     ArrayList<Marker> markers_list;
 
@@ -102,12 +102,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        //사고정보
         GetData task = new GetData();
         task.execute("http://congping2.dothome.co.kr/bb.php");
+        lat_list = new ArrayList<>();
+        lng_list = new ArrayList<>();
+        sago_list = new ArrayList<>();
+        markers_list = new ArrayList<>();
 
         //지도 view
         MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -134,13 +138,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         textView.setText(resultText);
 
-        lat_list = new ArrayList<>();
-        lng_list = new ArrayList<>();
-        address_list = new ArrayList<>();
-        sago_list = new ArrayList<>();
-        samang_list = new ArrayList<>();
-        markers_list = new ArrayList<>();
-
 
         //자전거 도로
         roadSwitch = (Switch) findViewById(R.id.roadSwitch);
@@ -151,12 +148,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Toast.makeText(MainActivity.this, "자전거도로 표시", Toast.LENGTH_SHORT).show();
                     //자전거 도로 표시 on
                     naverMap.setLayerGroupEnabled(NaverMap.LAYER_GROUP_BICYCLE, true);
-
                 }
                 else{
                     //자전거 도로 표시 off
                     naverMap.setLayerGroupEnabled(NaverMap.LAYER_GROUP_BICYCLE, false);
-
                 }
             }
         });
@@ -165,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setBackgroundColor(Color.BLACK);
-
     }
 
     //자전거 사고
@@ -249,7 +243,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //데이터를 담아놓을 리스트를 초기화한다.
         lat_list.clear();
         lng_list.clear();
-        address_list.clear();
         sago_list.clear();
 
         try {
@@ -273,9 +266,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //마커리스트담는 변수들
                 lat_list.add(latitudeValue);
                 lng_list.add(longitudeValue);
-                address_list.add(address);
                 sago_list.add(sagogunsu);
-                samang_list.add(samangjasu);
 
             }
             showMarker();
@@ -292,45 +283,40 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                    // 백그라운드 스레드
-                    for(Marker marker : markers_list){
-                        marker.setMap(null);
-                    }
-                    markers_list.clear();
-                    // 가져온 데이터의 수 만큼 마커 객체를 만들어 표시한다.
-                    for(int i= 0 ; i< lat_list.size(); i++) {
-                        // 값 추출
-                        double lat = lat_list.get(i);
-                        double lng = lng_list.get(i);
-                        String address = address_list.get(i);
-                        String sagogunsu = sago_list.get(i);
-                        String samangjasu = samang_list.get(i);
+                // 백그라운드 스레드
+                for(Marker marker : markers_list){
+                    marker.setMap(null);
+                }
+                markers_list.clear();
 
+                InfoWindow infoWindow = new InfoWindow();
 
+                // 가져온 데이터의 수 만큼 마커 객체를 만들어 표시한다.
+                for(int i= 0 ; i< lat_list.size(); i++) {
+                    // 값 추출
+                    double lat = lat_list.get(i);
+                    double lng = lng_list.get(i);
+                    String sagogunsu = sago_list.get(i);
 
-                        // 생성할 마커의 정보를 가지고 있는 객체를 생성
-                        Marker marker = new Marker();
-                        marker.setPosition(new LatLng(lat, lng));
-                        marker.setIcon(MarkerIcons.BLACK);
-                        marker.setIconTintColor(Color.RED);
-                        marker.setWidth(60);
-                        marker.setHeight(80);
+                    // 생성할 마커의 정보를 가지고 있는 객체를 생성
+                    Marker marker = new Marker();
+                    marker.setPosition(new LatLng(lat, lng));
+//                    marker.setIcon(MarkerIcons.BLACK);
+//                    marker.setIconTintColor(Color.RED);  //마커색깔
+                    marker.setIconPerspectiveEnabled(true);
+                    marker.setWidth(Marker.SIZE_AUTO);
+                    marker.setHeight(Marker.SIZE_AUTO);
+                    marker.setWidth(60);
+                    marker.setHeight(80);
+                    marker.setCaptionText("사고건수 : " + sagogunsu);
+                    marker.setCaptionOffset(5);  //마커와 텍스간의 거리
+                    marker.setCaptionAligns(Align.Top);  //텍스트 위치 마커 위로
+                    marker.setCaptionTextSize(10);  //텍스트 사이즈 설정
+                    marker.setIcon(OverlayImage.fromResource(R.drawable.accident));
 
-                        // 마커를 지도에 표시한다.
-                        markers_list.add(marker);
-
-//                        InfoWindow infoWindow = new InfoWindow();
-//                        infoWindow.setAdapter(new InfoWindow.DefaultTextAdapter(context) {
-//                            @NonNull
-//                            @Override
-//                            public CharSequence getText(@NonNull InfoWindow infoWindow) {
-//                                String msg = "사고건수 : " + sagogunsu +"\n사망자수 : " + samangjasu;
-//                                return msg;
-//                            }
-//                        });
-//                        infoWindow.open(marker);
-                    }
-
+                    // 마커를 지도에 표시한다.
+                    markers_list.add(marker);
+                }
             }
         });
     }
@@ -383,8 +369,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         for (Marker marker : markers_list) {
             marker.setMap(naverMap);
         }
-
-
     }
 
 

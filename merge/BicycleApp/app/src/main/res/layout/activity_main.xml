@@ -39,18 +39,17 @@
             android:layout_height="54dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="6dp"
-            android:layout_marginBottom="3dp"
             android:text="자전거 도로"
-            tools:ignore="MissingConstraints"
-            tools:layout_editor_absoluteX="232dp"
-            tools:layout_editor_absoluteY="674dp" />
+            android:textOff=""
+            android:textOn="" />
+
+
+
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
+            android:layout_height="match_parent" />
 
         <TextView
             android:layout_width="match_parent"
