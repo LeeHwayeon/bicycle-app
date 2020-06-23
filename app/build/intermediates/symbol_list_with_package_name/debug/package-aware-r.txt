@@ -751,6 +751,16 @@ id chronometer
 id collapseActionView
 id content
 id contentPanel
+id current_address
+id current_description
+id current_feelsLike
+id current_humidity
+id current_main
+id current_maxTemp
+id current_minTemp
+id current_temp
+id current_uvi
+id current_windSpeed
 id custom
 id customPanel
 id decor_content_parent
@@ -763,6 +773,10 @@ id edit_query
 id end
 id expand_activities_button
 id expanded_menu
+id forecast_date
+id forecast_main
+id forecast_max_temp
+id forecast_min_temp
 id forever
 id gone
 id group_divider
@@ -780,7 +794,9 @@ id left
 id line1
 id line3
 id listMode
+id listView
 id list_item
+id list_item_icon
 id message
 id middle
 id multiply
@@ -852,6 +868,7 @@ id title_template
 id top
 id topPanel
 id tv_WeatherInfo
+id tv_currentWeather
 id unchecked
 id uniform
 id up
@@ -901,6 +918,8 @@ layout abc_select_dialog_material
 layout abc_tooltip
 layout activity_main
 layout custom_dialog
+layout list_item_current
+layout list_item_forecast
 layout notification_action
 layout notification_action_tombstone
 layout notification_template_custom_big
