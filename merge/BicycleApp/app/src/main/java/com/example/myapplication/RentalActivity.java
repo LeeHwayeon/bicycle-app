@@ -2,14 +2,21 @@ package com.example.myapplication;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import java.util.ArrayList;
 
@@ -19,6 +26,8 @@ public class RentalActivity extends AppCompatActivity {
     TextView tv_currentWeather;
     TextView tv_WeatherInfo;
     TextView GpsTextView;
+    EditText et;
+
 
     boolean ResumeFlag = false;
 
@@ -46,6 +55,13 @@ public class RentalActivity extends AppCompatActivity {
         setContentView(R.layout.activity_rental);
         GpsTextView = (TextView) findViewById(R.id.GpsTextView);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setBackgroundColor(Color.BLACK);
+
+        et = findViewById(R.id.et);
+
+
         Initialize();
 
         ListView listView = (ListView)findViewById(R.id.listView);
@@ -61,6 +77,39 @@ public class RentalActivity extends AppCompatActivity {
         }
 
     }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case R.id.favorite:
+                Toast.makeText(this, "즐겨찾기", Toast.LENGTH_SHORT).show();
+                Intent favorite = new Intent(RentalActivity.this, FavoriteActivity.class);
+                startActivity(favorite);
+                return true;
+            case R.id.search:
+                Toast.makeText(this, "검색", Toast.LENGTH_SHORT).show();
+                Intent search = new Intent(RentalActivity.this, RentalActivity.class);
+                startActivity(search);
+                return true;
+            case R.id.weather:
+                Toast.makeText(this, "날씨", Toast.LENGTH_SHORT).show();
+                Intent weather= new Intent(RentalActivity.this, WeatherActivity.class);
+                startActivity(weather);
+                return true;
+            case R.id.home:
+                Toast.makeText(this, "홈", Toast.LENGTH_SHORT).show();
+                Intent home= new Intent(this, MainActivity.class);
+                startActivity(home);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     public void onResume() {
@@ -158,5 +207,7 @@ public class RentalActivity extends AppCompatActivity {
             }
         }
     };
+
+
 
 }

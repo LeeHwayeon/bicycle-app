@@ -37,7 +37,6 @@
 <!--        <activity android:name="com.example.myapplication.SearchActivity"/>-->
         <activity android:name="com.example.myapplication.FavoriteActivity"/>
         <activity android:name="com.example.myapplication.WeatherActivity"/>
-        <activity android:name="com.example.myapplication.NewSearchActivity"/>
         <activity android:name="com.example.myapplication.RentalActivity"/>
 
 

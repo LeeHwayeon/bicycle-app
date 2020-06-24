@@ -246,12 +246,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         sago_list.clear();
 
         try {
-            JSONObject jsonObject = new JSONObject(mJsonString);
-            JSONArray jsonArray = jsonObject.getJSONArray(TAG_JSON);
+            JSONObject accidentObject = new JSONObject(mJsonString);
+            JSONArray accidentArray = accidentObject.getJSONArray(TAG_JSON);
 
-            for(int i=0;i<jsonArray.length();i++){
+            for(int i=0;i<accidentArray.length();i++){
 
-                JSONObject item = jsonArray.getJSONObject(i);
+                JSONObject item = accidentArray.getJSONObject(i);
 
                 String address = item.getString(TAG_ADDRESS);
                 String sagogunsu = item.getString(TAG_SAGOGUNSU);

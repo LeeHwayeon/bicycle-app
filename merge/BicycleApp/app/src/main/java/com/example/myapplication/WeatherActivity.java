@@ -215,7 +215,7 @@ public class WeatherActivity extends AppCompatActivity {
                 return true;
             case R.id.search:
                 Toast.makeText(this, "검색", Toast.LENGTH_SHORT).show();
-                Intent search = new Intent(WeatherActivity.this, NewSearchActivity.class);
+                Intent search = new Intent(WeatherActivity.this, RentalActivity.class);
                 startActivity(search);
                 return true;
             case R.id.weather:

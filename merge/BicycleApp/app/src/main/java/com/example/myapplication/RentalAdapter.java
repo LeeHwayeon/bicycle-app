@@ -5,7 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
@@ -50,7 +53,6 @@ public class RentalAdapter extends BaseAdapter {
         parkingBikeTotCnt.setText(sample.get(position).getParkingBikeTotCnt());
         stationLatitude.setText(sample.get(position).getStationLatitude());
         stationLongitude.setText(sample.get(position).getStationLongitude());
-
 
         return view;
     }
