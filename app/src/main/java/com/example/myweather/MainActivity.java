@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
     TextView current_uvi;
 
     ImageView current_icon;
-    ImageView forecast_icon;
 
     boolean ResumeFlag = false;
 
@@ -66,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         GetGps();
         Initialize();
 
-        // 여기서부터 listView 를 구현하기 위해서 추가함.
+        // forecast listView 를 구현.
         ListView forecastListView = (ListView)findViewById(R.id.listView);
         final ForecastAdapter forecastAdapter = new ForecastAdapter(this,mForecastWeather);
         forecastListView.setAdapter(forecastAdapter);
@@ -104,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             lon = String.valueOf(gps.getLongitude());
             addr = gps.getAddress();
 
-            String address = "lon=" + lon + "lat" + lat + addr;
+            String address = addr;
             GpsTextView.setText(address);
 
 
@@ -117,9 +116,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void Initialize() {
-//        tv_currentWeather = (TextView) findViewById(R.id.tv_currentWeather);
-//        tv_WeatherInfo = (TextView) findViewById(R.id.tv_WeatherInfo);
-
         current_main = (TextView) findViewById(R.id.current_main);
         current_description = (TextView) findViewById(R.id.current_description);
         current_temp = (TextView) findViewById(R.id.current_temp);
@@ -131,18 +127,11 @@ public class MainActivity extends AppCompatActivity {
         current_maxTemp =(TextView) findViewById(R.id.current_maxTemp);
         current_icon = (ImageView) findViewById(R.id.list_item_icon);
 
-//        setImage(mCurrentWeather.g);
-//        setImage(mCurrentWeather.get(0).getCurrent_icon(), current_icon);
-
         mForecastWeather = new ArrayList<>();
         mCurrentWeather = new ArrayList<>();
         mThis = this;
         mWeather = new WeatherManager(lon, lat, mThis);
         mWeather.run();
-        Log.d("mWeather 실행", String.valueOf(mWeather));
-        Log.d("mForecastWeather 실행", String.valueOf(mForecastWeather));
-        Log.d("mCurrentWeather 실행", String.valueOf(mCurrentWeather));
-
     }
 
     public void DataToInformation() {
@@ -162,9 +151,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d("mCurrentWeather", String.valueOf(mCurrentWeather));
         }
 
-        for (int i = 0; i < mForecastWeatherData.size(); i++) {
+        for (int i = 1; i < mForecastWeatherData.size(); i++) {
             mForecastWeather.add(new ForecastWeather(
-                    String.valueOf(mForecastWeatherData.get(i).get("forecast_icon")),
                     String.valueOf(mForecastWeatherData.get(i).get("forecast_week")),
                     String.valueOf(mForecastWeatherData.get(i).get("forecast_main")),
                     String.valueOf(mForecastWeatherData.get(i).get("forecast_minTemp")),
@@ -176,41 +164,41 @@ public class MainActivity extends AppCompatActivity {
 
     public void setImage(String icon, ImageView img) {
         if (icon.equals("01d")) {
-            img.setImageResource(R.drawable.d01);
+            img.setImageResource(R.mipmap.d01_round);
         } else if (icon.equals("01n")) {
-            img.setImageResource(R.drawable.n01);
+            img.setImageResource(R.mipmap.n01_round);
         } else if (icon.equals("02d")) {
-            img.setImageResource(R.drawable.d02);
+            img.setImageResource(R.mipmap.d02_round);
         } else if (icon.equals("02n")) {
-            img.setImageResource(R.drawable.n02);
+            img.setImageResource(R.mipmap.n02_round);
         } else if (icon.equals("03d")) {
-            img.setImageResource(R.drawable.d03);
+            img.setImageResource(R.mipmap.d03_round);
         } else if (icon.equals("03n")) {
-            img.setImageResource(R.drawable.n03);
+            img.setImageResource(R.mipmap.d03_round);
         } else if (icon.equals("04d")) {
-            img.setImageResource(R.drawable.d04);
+            img.setImageResource(R.mipmap.d04_round);
         } else if (icon.equals("04n")) {
-            img.setImageResource(R.drawable.n04);
+            img.setImageResource(R.mipmap.d04_round);
         } else if (icon.equals("09d")) {
-            img.setImageResource(R.drawable.d09);
+            img.setImageResource(R.mipmap.d09_round);
         } else if (icon.equals("09n")) {
-            img.setImageResource(R.drawable.n09);
+            img.setImageResource(R.mipmap.d09_round);
         } else if (icon.equals("10d")) {
-            img.setImageResource(R.drawable.d10);
+            img.setImageResource(R.mipmap.d10_round);
         } else if (icon.equals("10n")) {
-            img.setImageResource(R.drawable.sun);
+            img.setImageResource(R.mipmap.n10_round);
         } else if (icon.equals("11d")) {
-            img.setImageResource(R.drawable.d11);
+            img.setImageResource(R.mipmap.d11_round);
         } else if (icon.equals("11n")) {
-            img.setImageResource(R.drawable.n11);
+            img.setImageResource(R.mipmap.d11_round);
         } else if (icon.equals("13d")) {
-            img.setImageResource(R.drawable.d13);
+            img.setImageResource(R.mipmap.d13_round);
         } else if (icon.equals("13n")) {
-            img.setImageResource(R.drawable.n13);
+            img.setImageResource(R.mipmap.d13_round);
         } else if (icon.equals("50d")) {
-            img.setImageResource(R.drawable.d50);
+            img.setImageResource(R.mipmap.d50_round);
         } else if (icon.equals("50n")) {
-            img.setImageResource(R.drawable.n50);
+            img.setImageResource(R.mipmap.d50_round);
         }
     }
 
@@ -221,20 +209,12 @@ public class MainActivity extends AppCompatActivity {
             switch (msg.what) {
                 case THREAD_HANDLER_SUCCESS_INFO:
                     mWeather.getWeather();
-//                    Log.d("handler mWeather.getWeather() 작동 결과", String.valueOf(mWeather.getWeather()));
 
                     // 현재
                     mCurrentWeatherData = mWeather.getWeather();
-//                    Log.d("mCurrentWeatherData 작동 결과", String.valueOf(mCurrentWeatherData));
-//                    if (mCurrentWeatherData.size() == 0)
-//                        tv_currentWeather.setText("데이터가 없습니다");
 
                     // 예보
                     mForecastWeatherData = mWeather.getWeather();
-//                    Log.d("mForecastWeatherData 작동 결과", String.valueOf(mForecastWeatherData));
-//                    Log.d("mForecastWeatherData size", String.valueOf(mForecastWeatherData.size()));
-//                    if (mForecastWeatherData.size() == 0)
-//                        tv_WeatherInfo.setText("데이터가 없습니다");
 
                     DataToInformation(); // 자료 클래스로 저장,
 
@@ -260,17 +240,7 @@ public class MainActivity extends AppCompatActivity {
                     current_minTemp.setText(minTemp);
                     current_maxTemp.setText(maxTemp);
 
-//                    setImage(icon, current_icon);
-
-                    Log.d("current_icon", icon);
-                    if (icon.equals("10n")) {
-                        current_icon.setImageResource(R.drawable.sun);
-                    }
-                    current_icon.setImageResource(R.drawable.sun);
-
-
-
-                    //DataChangedToHangeul();
+                    setImage(icon, current_icon);
                     break;
                 default:
                     break;

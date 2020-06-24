@@ -1,12 +1,8 @@
 package com.example.myweather;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.os.StrictMode;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -105,11 +101,7 @@ public class WeatherManager extends Thread {
             WeatherContent.put("current_minTemp", current_minTemp);
             WeatherContent.put("current_maxTemp", current_maxTemp);
 
-
             WeatherTotalValue.add(WeatherContent);
-            Log.i("current WeatherContent", String.valueOf(WeatherContent));
-            Log.i("current WeatherTotalValue", String.valueOf(WeatherTotalValue));
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -125,7 +117,6 @@ public class WeatherManager extends Thread {
                 String forecast_maxTemp = JArray.getJSONObject(i).getJSONObject("temp").getString("max");
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//                String formattedDtm = Instant.ofEpochSecond(forecast_date).atZone(ZoneId.of("GMT+9")).format(formatter);
                 String forecast_week = Instant.ofEpochSecond(forecast_date).atZone(ZoneId.of("GMT+9")).getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN);
 
                 ContentValues WeatherContent = new ContentValues();
@@ -135,9 +126,6 @@ public class WeatherManager extends Thread {
                 WeatherContent.put("forecast_maxTemp", forecast_maxTemp);
 
                 WeatherTotalValue.add(WeatherContent);
-                Log.i("forecast WeatherContent", String.valueOf(WeatherContent));
-                Log.i("forecast WeatherTotalValue", String.valueOf(WeatherTotalValue));
-
             }
 
         }catch (JSONException e) {

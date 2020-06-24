@@ -1,24 +1,19 @@
 package com.example.myweather;
 
 public class ForecastWeather {
-    String forecast_icon;
     String forecast_main;
     String forecast_minTemp;
     String forecast_maxTemp;
 
     String forecast_week;
 
-    public ForecastWeather(String forecast_icon, String forecast_week, String forecast_main, String forecast_minTemp, String forecast_maxTemp) {
-        this.forecast_icon = forecast_icon;
+    public ForecastWeather(String forecast_week, String forecast_main, String forecast_minTemp, String forecast_maxTemp) {
         this.forecast_main = forecast_main;
         this.forecast_minTemp = forecast_minTemp;
         this.forecast_maxTemp = forecast_maxTemp;
         this.forecast_week = forecast_week;
     }
 
-    public String getForecast_icon() {
-        return forecast_icon;
-    }
 
     public String getForecast_week() {
         return forecast_week;
