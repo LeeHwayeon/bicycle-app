@@ -36,7 +36,7 @@ public class ForecastAdapter extends BaseAdapter{
     }
 
     @Override
-    public View getView(int position, View converView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
         View view = mLayoutInflater.inflate(R.layout.list_item_forecast, null);
 
         TextView main = (TextView) view.findViewById(R.id.forecast_main);

@@ -1,11 +1,15 @@
 package com.example.myapplication;
 
-import android.annotation.SuppressLint;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,49 +17,104 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import java.util.ArrayList;
 
 public class WeatherActivity extends AppCompatActivity {
-
     private static final String TAG = "GpsInfo";
     public static final int THREAD_HANDLER_SUCCESS_INFO = 1;
-    TextView tv_WeatherInfo;
+
     TextView GpsTextView;
+    TextView current_main;
+    TextView current_description;
+    TextView current_temp;
+    TextView current_feelsLike;
+    TextView current_minTemp;
+    TextView current_maxTemp;
+    TextView current_humidity;
+    TextView current_windSpeed;
+    TextView current_uvi;
+
+    ImageView current_icon;
 
     boolean ResumeFlag = false;
 
     private GpsInfo gps;
 
-    ForeCastManager mForeCast;
+    WeatherManager mWeather;
 
-    String lon; // 좌표 설정
-    String lat;  // 좌표 설정
-    String juso;  // 주소 설정
+    String lon; // 위도
+    String lat;  // 경도
+    String addr;  // 주소
 
     WeatherActivity mThis;
-    ArrayList<ContentValues> mWeatherData;
-    ArrayList<WeatherInfo> mWeatherInformation;
 
+    // 현재
+    ArrayList<CurrentWeather> mCurrentWeather;
+    ArrayList<ContentValues> mCurrentWeatherData;
+
+    // 예보
+    ArrayList<ForecastWeather> mForecastWeather;
+    ArrayList<ContentValues> mForecastWeatherData;
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate()");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
-
         GpsTextView = (TextView) findViewById(R.id.GpsTextView);
 
         GetGps();
         Initialize();
 
+        // forecast listView 를 구현.
+        ListView forecastListView = (ListView)findViewById(R.id.listView);
+        final ForecastAdapter forecastAdapter = new ForecastAdapter(this,mForecastWeather);
+        forecastListView.setAdapter(forecastAdapter);
+
+        //툴바
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setBackgroundColor(Color.BLACK);
 
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.rental_list:
+                Toast.makeText(this, "대여소 리스트", Toast.LENGTH_SHORT).show();
+                Intent favorite = new Intent(this, RentalActivity.class);
+                startActivity(favorite);
+                return true;
+            case R.id.rental_marker:
+                Toast.makeText(this, "대여소", Toast.LENGTH_SHORT).show();
+                Intent search = new Intent(this, RentActivity.class);
+                startActivity(search);
+                return true;
+            case R.id.weather:
+                Toast.makeText(this, "날씨", Toast.LENGTH_SHORT).show();
+                Intent weather = new Intent(this, WeatherActivity.class);
+                startActivity(weather);
+                return true;
+            case R.id.home:
+                Toast.makeText(this, "홈", Toast.LENGTH_SHORT).show();
+                Intent home = new Intent(this, MainActivity.class);
+                startActivity(home);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -63,9 +122,6 @@ public class WeatherActivity extends AppCompatActivity {
     public void onResume() {
         Log.d(TAG, "onResume()");
         super.onResume();
-
-        // GetGps();
-        //Initialize();
         Log.d(TAG, "onResume() if문 밖");
         ResumeFlag = true;
         Log.d(TAG, "onResume() 정상 종료");
@@ -92,9 +148,9 @@ public class WeatherActivity extends AppCompatActivity {
             Log.d(TAG, "isGetLocation is true");
             lat = String.valueOf(gps.getLatitude());
             lon = String.valueOf(gps.getLongitude());
-            juso = gps.getAddress();
+            addr = gps.getAddress();
 
-            String address = "위도 : " + lat + "\n경도 : " + lon + "\n주소 : " + juso;
+            String address = addr;
             GpsTextView.setText(address);
 
 
@@ -106,64 +162,133 @@ public class WeatherActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void Initialize() {
-        tv_WeatherInfo = (TextView) findViewById(R.id.tv_WeatherInfo);
-        mWeatherInformation = new ArrayList<>();
+        current_main = (TextView) findViewById(R.id.current_main);
+        current_description = (TextView) findViewById(R.id.current_description);
+        current_temp = (TextView) findViewById(R.id.current_temp);
+        current_feelsLike =(TextView) findViewById(R.id.current_feelsLike);
+        current_humidity = (TextView) findViewById(R.id.current_humidity);
+        current_windSpeed = (TextView) findViewById(R.id.current_windSpeed);
+        current_uvi = (TextView) findViewById(R.id.current_uvi);
+        current_minTemp = (TextView) findViewById(R.id.current_minTemp);
+        current_maxTemp =(TextView) findViewById(R.id.current_maxTemp);
+        current_icon = (ImageView) findViewById(R.id.list_item_icon);
+
+        mForecastWeather = new ArrayList<>();
+        mCurrentWeather = new ArrayList<>();
         mThis = this;
-        mForeCast = new ForeCastManager(lon, lat, mThis);
-        mForeCast.run();
-        Log.d("ForeCastMaber의 실행", String.valueOf(mForeCast));
+        mWeather = new WeatherManager(lon, lat, mThis);
+        mWeather.run();
     }
 
-    //읽어온 날씨 값을 출력해주는 메써드
-    @SuppressLint("LongLogTag")
-    public String PrintValue() {
-        String mData = "";
-        for (int i = 0; i < mWeatherInformation.size(); i++) {
-            Log.d("mWeatherInfomation.size() 확인", String.valueOf(mWeatherInformation.size()));
-            mData = mData
-                    + mWeatherInformation.get(i).getWeather_Name() + "\r\n"
-                    + "Max: " + mWeatherInformation.get(i).getTemp_Max() + "℃"
-                    + " /Min: " + mWeatherInformation.get(i).getTemp_Min() + "℃" + "\r\n";
-
-            mData = mData + "\r\n" + "----------------------------------------------" + "\r\n";
-            Log.d("mWeatherInfomation.get(i).getWeather_Name()", String.valueOf(mWeatherInformation.get(1).getWeather_Name()));
-            Log.d("mData의 결과", mData);
-
-        }
-        return mData;
-    }
     public void DataToInformation() {
-        for (int i = 0; i < mWeatherData.size(); i++) {
-            mWeatherInformation.add(new WeatherInfo(
-                    String.valueOf(mWeatherData.get(i).get("weather_Name")),
-                    String.valueOf(mWeatherData.get(i).get("temp_Min")),
-                    String.valueOf(mWeatherData.get(i).get("temp_Max"))
+        for (int i = 0; i < mCurrentWeatherData.size(); i++) {
+            mCurrentWeather.add(new CurrentWeather(
+                    String.valueOf(mCurrentWeatherData.get(i).get("current_icon")),
+                    String.valueOf(mCurrentWeatherData.get(i).get("current_main")),
+                    String.valueOf(mCurrentWeatherData.get(i).get("current_description")),
+                    String.valueOf(mCurrentWeatherData.get(i).get("current_temp")),
+                    String.valueOf(mCurrentWeatherData.get(i).get("current_feelsLike")),
+                    String.valueOf(mCurrentWeatherData.get(i).get("current_humidity")),
+                    String.valueOf(mCurrentWeatherData.get(i).get("current_windSpeed")),
+                    String.valueOf(mCurrentWeatherData.get(i).get("current_uvi")),
+                    String.valueOf(mCurrentWeatherData.get(i).get("current_minTemp")),
+                    String.valueOf(mCurrentWeatherData.get(i).get("current_maxTemp"))
             ));
+            Log.d("mCurrentWeather", String.valueOf(mCurrentWeather));
+        }
+
+        for (int i = 1; i < mForecastWeatherData.size(); i++) {
+            mForecastWeather.add(new ForecastWeather(
+                    String.valueOf(mForecastWeatherData.get(i).get("forecast_week")),
+                    String.valueOf(mForecastWeatherData.get(i).get("forecast_main")),
+                    String.valueOf(mForecastWeatherData.get(i).get("forecast_minTemp")),
+                    String.valueOf(mForecastWeatherData.get(i).get("forecast_maxTemp"))
+            ));
+            Log.d("mForecastWeather", String.valueOf(mForecastWeather));
+        }
+    }
+
+    public void setImage(String icon, ImageView img) {
+        if (icon.equals("01d")) {
+            img.setImageResource(R.mipmap.d01_round);
+        } else if (icon.equals("01n")) {
+            img.setImageResource(R.mipmap.n01_round);
+        } else if (icon.equals("02d")) {
+            img.setImageResource(R.mipmap.d02_round);
+        } else if (icon.equals("02n")) {
+            img.setImageResource(R.mipmap.n02_round);
+        } else if (icon.equals("03d")) {
+            img.setImageResource(R.mipmap.d03_round);
+        } else if (icon.equals("03n")) {
+            img.setImageResource(R.mipmap.d03_round);
+        } else if (icon.equals("04d")) {
+            img.setImageResource(R.mipmap.d04_round);
+        } else if (icon.equals("04n")) {
+            img.setImageResource(R.mipmap.d04_round);
+        } else if (icon.equals("09d")) {
+            img.setImageResource(R.mipmap.d09_round);
+        } else if (icon.equals("09n")) {
+            img.setImageResource(R.mipmap.d09_round);
+        } else if (icon.equals("10d")) {
+            img.setImageResource(R.mipmap.d10_round);
+        } else if (icon.equals("10n")) {
+            img.setImageResource(R.mipmap.n10_round);
+        } else if (icon.equals("11d")) {
+            img.setImageResource(R.mipmap.d11_round);
+        } else if (icon.equals("11n")) {
+            img.setImageResource(R.mipmap.d11_round);
+        } else if (icon.equals("13d")) {
+            img.setImageResource(R.mipmap.d13_round);
+        } else if (icon.equals("13n")) {
+            img.setImageResource(R.mipmap.d13_round);
+        } else if (icon.equals("50d")) {
+            img.setImageResource(R.mipmap.d50_round);
+        } else if (icon.equals("50n")) {
+            img.setImageResource(R.mipmap.d50_round);
         }
     }
 
     public Handler handler = new Handler() {
-        @SuppressLint("LongLogTag")
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
                 case THREAD_HANDLER_SUCCESS_INFO:
-                    mForeCast.getmWeather();
-                    Log.d("handler mForeCast.getmWeather() 작동 결과", String.valueOf(mForeCast.getmWeather()));
-                    mWeatherData = mForeCast.getmWeather();
-                    Log.d("mWeatherData 작동 결과", String.valueOf(mWeatherData));
-                    if (mWeatherData.size() == 0)
-                        tv_WeatherInfo.setText("데이터가 없습니다");
+                    mWeather.getWeather();
+
+                    // 현재
+                    mCurrentWeatherData = mWeather.getWeather();
+
+                    // 예보
+                    mForecastWeatherData = mWeather.getWeather();
 
                     DataToInformation(); // 자료 클래스로 저장,
 
-                    String data = "";
-                    data = PrintValue();
-                    Log.i("handler 작동 결과", data);
+                    // 현재 날씨 띄우는 view
+                    String main = mCurrentWeather.get(0).current_main;
+                    String description = mCurrentWeather.get(0).current_description;
+                    String temp = mCurrentWeather.get(0).current_temp;
+                    String feelsLike = mCurrentWeather.get(0).current_feelsLike;
+                    String humidity = mCurrentWeather.get(0).current_humidity;
+                    String windSpeed = mCurrentWeather.get(0).current_windSpeed;
+                    String uvi = mCurrentWeather.get(0).current_uvi;
+                    String minTemp = mCurrentWeather.get(0).current_minTemp;
+                    String maxTemp = mCurrentWeather.get(0).current_maxTemp;
+                    String icon = mCurrentWeather.get(0).current_icon;
 
-                    tv_WeatherInfo.setText(data);
+                    current_main.setText(main);
+                    current_description.setText(description);
+                    current_temp.setText(temp);
+                    current_feelsLike.setText(feelsLike);
+                    current_humidity.setText(humidity);
+                    current_windSpeed.setText(windSpeed);
+                    current_uvi.setText(uvi);
+                    current_minTemp.setText(minTemp);
+                    current_maxTemp.setText(maxTemp);
+
+                    setImage(icon, current_icon);
                     break;
                 default:
                     break;
@@ -204,38 +329,4 @@ public class WeatherActivity extends AppCompatActivity {
         alertDialog.show();
         Log.d(TAG, "Dialog 창 띄움");
     };
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()){
-            case R.id.rental_list:
-                Toast.makeText(this, "대여소 리스트", Toast.LENGTH_SHORT).show();
-                Intent list = new Intent(this, RentalActivity.class);
-                startActivity(list);
-                return true;
-            case R.id.rental_marker:
-                Toast.makeText(this, "대여소", Toast.LENGTH_SHORT).show();
-                Intent rental_marker = new Intent(this, RentActivity.class);
-                startActivity(rental_marker);
-                return true;
-            case R.id.weather:
-                Toast.makeText(this, "날씨", Toast.LENGTH_SHORT).show();
-                Intent weather= new Intent(this, WeatherActivity.class);
-                startActivity(weather);
-                return true;
-            case R.id.home:
-                Toast.makeText(this, "홈", Toast.LENGTH_SHORT).show();
-                Intent home= new Intent(this, MainActivity.class);
-                startActivity(home);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
 }

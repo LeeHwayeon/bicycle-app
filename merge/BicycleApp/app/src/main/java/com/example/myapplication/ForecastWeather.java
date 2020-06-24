@@ -14,6 +14,7 @@ public class ForecastWeather {
         this.forecast_week = forecast_week;
     }
 
+
     public String getForecast_week() {
         return forecast_week;
     }
