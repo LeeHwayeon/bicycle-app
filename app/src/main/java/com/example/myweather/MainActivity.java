@@ -6,33 +6,34 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "GpsInfo";
     public static final int THREAD_HANDLER_SUCCESS_INFO = 1;
-    TextView tv_currentWeather;
-    TextView tv_WeatherInfo;
+
     TextView GpsTextView;
+    TextView current_main;
+    TextView current_description;
+    TextView current_temp;
+    TextView current_feelsLike;
+    TextView current_minTemp;
+    TextView current_maxTemp;
+    TextView current_humidity;
+    TextView current_windSpeed;
+    TextView current_uvi;
+
+    ImageView current_icon;
+    ImageView forecast_icon;
 
     boolean ResumeFlag = false;
 
@@ -54,10 +55,6 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<ForecastWeather> mForecastWeather;
     ArrayList<ContentValues> mForecastWeatherData;
 
-
-//    ArrayList<Weather> ListWeather;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate()");
@@ -69,65 +66,10 @@ public class MainActivity extends AppCompatActivity {
         GetGps();
         Initialize();
 
-//        Log.d("mForecastWeatherData", String.valueOf(mForecastWeatherData.size()));
-
-
-
         // 여기서부터 listView 를 구현하기 위해서 추가함.
-//        ListView forecastListView = (ListView)findViewById(R.id.listView);
-//        final ForecastAdapter forecastAdapter = new ForecastAdapter(this,mForecastWeather);
-//
-//        forecastListView.setAdapter(forecastAdapter);
-
-//        forecastListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-//            @Override
-//            public void onItemClick(AdapterView parent, View v, int position, long id){
-//                Toast.makeText(getApplicationContext(),
-//                        forecastAdapter.getItem(position).getForecast_week(),
-//                        Toast.LENGTH_LONG).show();
-//            }
-//        });
-
-//        ListView currentListView = (ListView)findViewById(R.id.listView);
-//        final CurrentAdapter currentAdapter = new CurrentAdapter(this, mCurrentWeather);
-//
-//        currentListView.setAdapter(currentAdapter);
-
-
-//        ListView WeatherListView = (ListView)findViewById(R.id.listView);
-//        final Weather[] items = new Weather[8];
-//
-//        for (int i = 0; i < ListWeather.size(); i++) {
-//            if (i == 0) {
-//                items[i] = new Weather("current " + i, WeatherAdapter.TYPE_CURRENT);
-//            } else {
-//                items[i] = new Weather("forecast " + i, WeatherAdapter.TYPE_FORECAST);
-//            }
-//        }
-
-//
-//        ListView WeatherListView = (ListView)findViewById(R.id.listView);
-//        final WeatherAdapter weatherAdapter= new WeatherAdapter(this,ListWeather);
-//         WeatherListView.setAdapter(weatherAdapter);
-
-
-        ListView listView = (ListView)findViewById(R.id.listView);
-        final CurrentAdapter currentAdapter = new CurrentAdapter(this, mCurrentWeather);
-        final ForecastAdapter forecastAdapter = new ForecastAdapter(this, mForecastWeather);
-        for (int i = 0; i<8; i++) {
-            if(i == 0) {
-                listView.setAdapter(currentAdapter);
-                Log.d("list", String.valueOf(listView));
-            }
-            else {
-                listView.setAdapter(forecastAdapter);
-                Log.d("list", String.valueOf(listView));
-            }
-        }
-
-//        listView.setAdapter(currentAdapter);
-
-
+        ListView forecastListView = (ListView)findViewById(R.id.listView);
+        final ForecastAdapter forecastAdapter = new ForecastAdapter(this,mForecastWeather);
+        forecastListView.setAdapter(forecastAdapter);
     }
 
     @Override
@@ -162,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
             lon = String.valueOf(gps.getLongitude());
             addr = gps.getAddress();
 
-            String address = "위도 : " + lat + "\n경도 : " + lon + "\n주소 : " + addr;
+            String address = "lon=" + lon + "lat" + lat + addr;
             GpsTextView.setText(address);
 
 
@@ -175,57 +117,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void Initialize() {
-        tv_currentWeather = (TextView) findViewById(R.id.tv_currentWeather);
-        tv_WeatherInfo = (TextView) findViewById(R.id.tv_WeatherInfo);
+//        tv_currentWeather = (TextView) findViewById(R.id.tv_currentWeather);
+//        tv_WeatherInfo = (TextView) findViewById(R.id.tv_WeatherInfo);
+
+        current_main = (TextView) findViewById(R.id.current_main);
+        current_description = (TextView) findViewById(R.id.current_description);
+        current_temp = (TextView) findViewById(R.id.current_temp);
+        current_feelsLike =(TextView) findViewById(R.id.current_feelsLike);
+        current_humidity = (TextView) findViewById(R.id.current_humidity);
+        current_windSpeed = (TextView) findViewById(R.id.current_windSpeed);
+        current_uvi = (TextView) findViewById(R.id.current_uvi);
+        current_minTemp = (TextView) findViewById(R.id.current_minTemp);
+        current_maxTemp =(TextView) findViewById(R.id.current_maxTemp);
+        current_icon = (ImageView) findViewById(R.id.list_item_icon);
+
+//        setImage(mCurrentWeather.g);
+//        setImage(mCurrentWeather.get(0).getCurrent_icon(), current_icon);
+
         mForecastWeather = new ArrayList<>();
         mCurrentWeather = new ArrayList<>();
         mThis = this;
         mWeather = new WeatherManager(lon, lat, mThis);
         mWeather.run();
         Log.d("mWeather 실행", String.valueOf(mWeather));
+        Log.d("mForecastWeather 실행", String.valueOf(mForecastWeather));
+        Log.d("mCurrentWeather 실행", String.valueOf(mCurrentWeather));
+
     }
-
-
-    // 읽어온 현재 날씨 출력
-    public String CurrentPrintValue() {
-        String currentData = "";
-        for(int i = 0; i < 1; i++) {
-            currentData = currentData
-                    + mCurrentWeather.get(i).current_main + " / "
-                    + mCurrentWeather.get(i).current_description + "\r\n"
-                    + "온도 "+ mCurrentWeather.get(i).current_temp + "℃ / "
-                    + "체감온도 " + mCurrentWeather.get(i).current_feelsLike + "℃ \r\n"
-                    + "습도 " + mCurrentWeather.get(i).current_humidity + "% / "
-                    + "풍속 " + mCurrentWeather.get(i).current_windSpeed + " m/s / "
-                    + "자외선 " + mCurrentWeather.get(i).current_uvi + "\r\n"
-                    + "최저 온도 " + mCurrentWeather.get(i).current_minTemp + "℃ / "
-                    + "최고 온도 " + mCurrentWeather.get(i).current_maxTemp + "℃";
-            currentData = currentData + "\r\n" + "----------------------------------------------" + "\r\n";
-            Log.d("currentData", currentData);
-        }
-        return currentData;
-    }
-
-    // 읽어온 예보 날씨 출력
-    public String ForecastPrintValue() {
-        String forecastData = "";
-        for (int i = 1; i < mForecastWeather.size(); i++) {
-            forecastData = forecastData
-                    + mForecastWeather.get(i).getForecast_week() + "\r\n"
-                    + mForecastWeather.get(i).getForecast_main() + " "
-                    + mForecastWeather.get(i).getForecast_minTemp() + " "
-                    + mForecastWeather.get(i).getForecast_maxTemp();
-
-            forecastData = forecastData + "\r\n" + "----------------------------------------------" + "\r\n";
-            Log.d("forecastData의 결과", forecastData);
-        }
-        return forecastData;
-    }
-
 
     public void DataToInformation() {
         for (int i = 0; i < mCurrentWeatherData.size(); i++) {
             mCurrentWeather.add(new CurrentWeather(
+                    String.valueOf(mCurrentWeatherData.get(i).get("current_icon")),
                     String.valueOf(mCurrentWeatherData.get(i).get("current_main")),
                     String.valueOf(mCurrentWeatherData.get(i).get("current_description")),
                     String.valueOf(mCurrentWeatherData.get(i).get("current_temp")),
@@ -241,21 +164,55 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < mForecastWeatherData.size(); i++) {
             mForecastWeather.add(new ForecastWeather(
+                    String.valueOf(mForecastWeatherData.get(i).get("forecast_icon")),
                     String.valueOf(mForecastWeatherData.get(i).get("forecast_week")),
-//                    week[i] = String.valueOf(mForecastWeatherData.get(i).get("forecast_week")),
                     String.valueOf(mForecastWeatherData.get(i).get("forecast_main")),
                     String.valueOf(mForecastWeatherData.get(i).get("forecast_minTemp")),
                     String.valueOf(mForecastWeatherData.get(i).get("forecast_maxTemp"))
             ));
             Log.d("mForecastWeather", String.valueOf(mForecastWeather));
         }
-
     }
 
-//    for (int i = 0; i < mForecastWeatherData.size(); i++) {
-//        week[i] = String.valueOf(mForecastWeatherData.get(i).get("forecast_week"));
-//        Log.d("mForecastWeather", String.valueOf(week[i]));
-//    }
+    public void setImage(String icon, ImageView img) {
+        if (icon.equals("01d")) {
+            img.setImageResource(R.drawable.d01);
+        } else if (icon.equals("01n")) {
+            img.setImageResource(R.drawable.n01);
+        } else if (icon.equals("02d")) {
+            img.setImageResource(R.drawable.d02);
+        } else if (icon.equals("02n")) {
+            img.setImageResource(R.drawable.n02);
+        } else if (icon.equals("03d")) {
+            img.setImageResource(R.drawable.d03);
+        } else if (icon.equals("03n")) {
+            img.setImageResource(R.drawable.n03);
+        } else if (icon.equals("04d")) {
+            img.setImageResource(R.drawable.d04);
+        } else if (icon.equals("04n")) {
+            img.setImageResource(R.drawable.n04);
+        } else if (icon.equals("09d")) {
+            img.setImageResource(R.drawable.d09);
+        } else if (icon.equals("09n")) {
+            img.setImageResource(R.drawable.n09);
+        } else if (icon.equals("10d")) {
+            img.setImageResource(R.drawable.d10);
+        } else if (icon.equals("10n")) {
+            img.setImageResource(R.drawable.sun);
+        } else if (icon.equals("11d")) {
+            img.setImageResource(R.drawable.d11);
+        } else if (icon.equals("11n")) {
+            img.setImageResource(R.drawable.n11);
+        } else if (icon.equals("13d")) {
+            img.setImageResource(R.drawable.d13);
+        } else if (icon.equals("13n")) {
+            img.setImageResource(R.drawable.n13);
+        } else if (icon.equals("50d")) {
+            img.setImageResource(R.drawable.d50);
+        } else if (icon.equals("50n")) {
+            img.setImageResource(R.drawable.n50);
+        }
+    }
 
     public Handler handler = new Handler() {
         @Override
@@ -264,32 +221,56 @@ public class MainActivity extends AppCompatActivity {
             switch (msg.what) {
                 case THREAD_HANDLER_SUCCESS_INFO:
                     mWeather.getWeather();
-                    Log.d("handler mWeather.getWeather() 작동 결과", String.valueOf(mWeather.getWeather()));
+//                    Log.d("handler mWeather.getWeather() 작동 결과", String.valueOf(mWeather.getWeather()));
 
                     // 현재
                     mCurrentWeatherData = mWeather.getWeather();
-                    Log.d("mCurrentWeatherData 작동 결과", String.valueOf(mCurrentWeatherData));
-                    if (mCurrentWeatherData.size() == 0)
-                        tv_currentWeather.setText("데이터가 없습니다");
+//                    Log.d("mCurrentWeatherData 작동 결과", String.valueOf(mCurrentWeatherData));
+//                    if (mCurrentWeatherData.size() == 0)
+//                        tv_currentWeather.setText("데이터가 없습니다");
 
                     // 예보
                     mForecastWeatherData = mWeather.getWeather();
-                    Log.d("mForecastWeatherData 작동 결과", String.valueOf(mForecastWeatherData));
-                    Log.d("mForecastWeatherData size", String.valueOf(mForecastWeatherData.size()));
-                    if (mForecastWeatherData.size() == 0)
-                        tv_WeatherInfo.setText("데이터가 없습니다");
+//                    Log.d("mForecastWeatherData 작동 결과", String.valueOf(mForecastWeatherData));
+//                    Log.d("mForecastWeatherData size", String.valueOf(mForecastWeatherData.size()));
+//                    if (mForecastWeatherData.size() == 0)
+//                        tv_WeatherInfo.setText("데이터가 없습니다");
 
                     DataToInformation(); // 자료 클래스로 저장,
 
-                    String current = "";
-                    String forecast = "";
+                    // 현재 날씨 띄우는 view
+                    String main = mCurrentWeather.get(0).current_main;
+                    String description = mCurrentWeather.get(0).current_description;
+                    String temp = mCurrentWeather.get(0).current_temp;
+                    String feelsLike = mCurrentWeather.get(0).current_feelsLike;
+                    String humidity = mCurrentWeather.get(0).current_humidity;
+                    String windSpeed = mCurrentWeather.get(0).current_windSpeed;
+                    String uvi = mCurrentWeather.get(0).current_uvi;
+                    String minTemp = mCurrentWeather.get(0).current_minTemp;
+                    String maxTemp = mCurrentWeather.get(0).current_maxTemp;
+                    String icon = mCurrentWeather.get(0).current_icon;
 
-//                    DataChangedToHangeul();
-                    current = CurrentPrintValue();
-                    forecast = ForecastPrintValue();
+                    current_main.setText(main);
+                    current_description.setText(description);
+                    current_temp.setText(temp);
+                    current_feelsLike.setText(feelsLike);
+                    current_humidity.setText(humidity);
+                    current_windSpeed.setText(windSpeed);
+                    current_uvi.setText(uvi);
+                    current_minTemp.setText(minTemp);
+                    current_maxTemp.setText(maxTemp);
 
-                    tv_currentWeather.setText(current);
-                    tv_WeatherInfo.setText(forecast);
+//                    setImage(icon, current_icon);
+
+                    Log.d("current_icon", icon);
+                    if (icon.equals("10n")) {
+                        current_icon.setImageResource(R.drawable.sun);
+                    }
+                    current_icon.setImageResource(R.drawable.sun);
+
+
+
+                    //DataChangedToHangeul();
                     break;
                 default:
                     break;

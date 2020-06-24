@@ -21,7 +21,7 @@
       "properties": {
         "packageId": "com.example.myweather",
         "split": "",
-        "minSdkVersion": "29"
+        "minSdkVersion": "19"
       }
     }
   ]

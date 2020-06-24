@@ -1,10 +1,11 @@
 package com.example.myweather;
 
 public class CurrentWeather {
+    String current_icon;
     String current_main;
     String current_description;
-    String current_temp;
     String current_feelsLike;
+    String current_temp;
     String current_humidity;
     String current_windSpeed;
     String current_uvi;
@@ -12,10 +13,11 @@ public class CurrentWeather {
     String current_maxTemp;
 
 
-    public CurrentWeather(String current_main, String current_description, String current_temp, String current_feelsLike,
+    public CurrentWeather(String current_icon, String current_main, String current_description, String current_temp, String current_feelsLike,
                           String current_humidity, String current_windSpeed, String current_uvi, String current_minTemp,
                           String current_maxTemp) {
 
+        this.current_icon = current_icon;
         this.current_main = current_main;
         this.current_description = current_description;
         this.current_temp = current_temp;
@@ -26,6 +28,10 @@ public class CurrentWeather {
         this.current_minTemp = current_minTemp;
         this.current_maxTemp = current_maxTemp;
 
+    }
+
+    public String getCurrent_icon() {
+        return current_icon;
     }
 
     public String getCurrent_main() {

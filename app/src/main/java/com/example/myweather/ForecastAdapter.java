@@ -5,10 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -39,7 +36,7 @@ public class ForecastAdapter extends BaseAdapter{
     }
 
     @Override
-    public View getView(int position, View converView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
         View view = mLayoutInflater.inflate(R.layout.list_item_forecast, null);
 
         TextView main = (TextView) view.findViewById(R.id.forecast_main);

@@ -1,8 +1,12 @@
 package com.example.myweather;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -78,6 +82,7 @@ public class WeatherManager extends Thread {
         try {
             JSONObject jObject = new JSONObject(receiveMsg).getJSONObject("current");
             JSONArray JArray = new JSONObject(receiveMsg).getJSONArray("daily");
+            String current_icon = jObject.getJSONArray("weather").getJSONObject(0).getString("icon");
             String current_main = jObject.getJSONArray("weather").getJSONObject(0).getString("main");
             String current_description = jObject.getJSONArray("weather").getJSONObject(0).getString("description");
             String current_temp = jObject.getString("temp");
@@ -89,6 +94,7 @@ public class WeatherManager extends Thread {
             String current_maxTemp = JArray.getJSONObject(0).getJSONObject("temp").getString("max");
 
             ContentValues WeatherContent = new ContentValues();
+            WeatherContent.put("current_icon", current_icon);
             WeatherContent.put("current_main", current_main);
             WeatherContent.put("current_description", current_description);
             WeatherContent.put("current_temp", current_temp);
@@ -99,8 +105,8 @@ public class WeatherManager extends Thread {
             WeatherContent.put("current_minTemp", current_minTemp);
             WeatherContent.put("current_maxTemp", current_maxTemp);
 
-            WeatherTotalValue.add(WeatherContent);
 
+            WeatherTotalValue.add(WeatherContent);
             Log.i("current WeatherContent", String.valueOf(WeatherContent));
             Log.i("current WeatherTotalValue", String.valueOf(WeatherTotalValue));
 
@@ -113,6 +119,7 @@ public class WeatherManager extends Thread {
 
             for (int i = 1; i < 8; i++) {
                 long forecast_date = JArray.getJSONObject(i).getLong("dt");
+                String forecast_icon = JArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("icon");
                 String forecast_main = JArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("main");
                 String forecast_minTemp = JArray.getJSONObject(i).getJSONObject("temp").getString("min");
                 String forecast_maxTemp = JArray.getJSONObject(i).getJSONObject("temp").getString("max");
