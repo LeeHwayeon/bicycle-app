@@ -125,18 +125,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //특정시간에 사고주의알림
         new AlarmHATT(getApplicationContext()).Alarm();
 
-        TextView textView = (TextView)findViewById(R.id.textView);
-        String resultText = "값이없음";
-
-        try {
-            resultText = new AccidentParser().execute().get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        textView.setText(resultText);
+//        TextView textView = (TextView)findViewById(R.id.textView);
+//        String resultText = "값이없음";
+//
+//        try {
+//            resultText = new AccidentParser().execute().get();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//        }
+//
+//        textView.setText(resultText);
 
 
         //자전거 도로
@@ -337,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return true;
             case R.id.search:
                 Toast.makeText(this, "검색", Toast.LENGTH_SHORT).show();
-                Intent search = new Intent(MainActivity.this, SearchActivity.class);
+                Intent search = new Intent(MainActivity.this, RentalActivity.class);
                 startActivity(search);
                 return true;
             case R.id.weather:
