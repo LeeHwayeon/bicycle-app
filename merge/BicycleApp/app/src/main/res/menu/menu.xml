@@ -3,16 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/search"
-        android:icon="@drawable/search"
-        android:title="대여소 검색"
+        android:id="@+id/rental_marker"
+        android:icon="@drawable/rent_bike2"
+        android:title="대여소 마커 표시"
         app:showAsAction="always"/>
 
     <item
-        android:id="@+id/favorite"
-        android:icon="@drawable/favorite"
+        android:id="@+id/rental_list"
+        android:icon="@drawable/list"
         app:showAsAction="always"
-        android:title="즐겨찾기" />
+        android:title="대여소 리스트" />
 
     <item
         android:id="@+id/weather"
@@ -26,6 +26,5 @@
         android:icon="@drawable/home"
         app:showAsAction="always"
         android:title="메인" />
-
 
 </menu>

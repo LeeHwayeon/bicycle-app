@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.myapplication">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -34,10 +35,11 @@
         <receiver android:name="com.example.myapplication.BroadcastD"></receiver>
         <activity android:name="com.example.myapplication.RegisterActivity" />
         <activity android:name="com.example.myapplication.MainActivity"/>
-<!--        <activity android:name="com.example.myapplication.SearchActivity"/>-->
-        <activity android:name="com.example.myapplication.FavoriteActivity"/>
         <activity android:name="com.example.myapplication.WeatherActivity"/>
         <activity android:name="com.example.myapplication.RentalActivity"/>
+        <activity android:name="com.example.myapplication.RentActivity"
+            tools:ignore="DuplicateActivity" />
+
 
 
 

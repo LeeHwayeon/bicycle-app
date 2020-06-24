@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +27,6 @@ public class RentalActivity extends AppCompatActivity {
     TextView tv_currentWeather;
     TextView tv_WeatherInfo;
     TextView GpsTextView;
-    EditText et;
 
 
     boolean ResumeFlag = false;
@@ -59,9 +59,6 @@ public class RentalActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setBackgroundColor(Color.BLACK);
 
-        et = findViewById(R.id.et);
-
-
         Initialize();
 
         ListView listView = (ListView)findViewById(R.id.listView);
@@ -84,26 +81,26 @@ public class RentalActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()){
-            case R.id.favorite:
-                Toast.makeText(this, "즐겨찾기", Toast.LENGTH_SHORT).show();
-                Intent favorite = new Intent(RentalActivity.this, FavoriteActivity.class);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.rental_list:
+                Toast.makeText(this, "대여소 리스트", Toast.LENGTH_SHORT).show();
+                Intent favorite = new Intent(this, RentalActivity.class);
                 startActivity(favorite);
                 return true;
-            case R.id.search:
-                Toast.makeText(this, "검색", Toast.LENGTH_SHORT).show();
-                Intent search = new Intent(RentalActivity.this, RentalActivity.class);
+            case R.id.rental_marker:
+                Toast.makeText(this, "대여소", Toast.LENGTH_SHORT).show();
+                Intent search = new Intent(this, RentActivity.class);
                 startActivity(search);
                 return true;
             case R.id.weather:
                 Toast.makeText(this, "날씨", Toast.LENGTH_SHORT).show();
-                Intent weather= new Intent(RentalActivity.this, WeatherActivity.class);
+                Intent weather = new Intent(this, WeatherActivity.class);
                 startActivity(weather);
                 return true;
             case R.id.home:
                 Toast.makeText(this, "홈", Toast.LENGTH_SHORT).show();
-                Intent home= new Intent(this, MainActivity.class);
+                Intent home = new Intent(this, MainActivity.class);
                 startActivity(home);
                 return true;
         }
@@ -144,7 +141,6 @@ public class RentalActivity extends AppCompatActivity {
     }
 
 
-    // 읽어온 현재 날씨 출력
     public String CurrentPrintValue() {
         String currentData = "";
         for(int i = 0; i < mCurrentRental.size(); i++) {
@@ -159,8 +155,6 @@ public class RentalActivity extends AppCompatActivity {
         }
         return currentData;
     }
-
-
 
     public void DataToInformation() {
         for (int i = 0; i < mCurrentRentalData.size(); i++) {
@@ -207,7 +201,5 @@ public class RentalActivity extends AppCompatActivity {
             }
         }
     };
-
-
 
 }

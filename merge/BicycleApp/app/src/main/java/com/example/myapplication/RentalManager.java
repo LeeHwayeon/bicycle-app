@@ -125,7 +125,6 @@ public class RentalManager extends Thread {
             StrictMode.setThreadPolicy(policy);
         }
         ManageRental = GetOpenRental(rackTotCnt, stationName, parkingBikeTotCnt, stationLatitude, stationLongitude);
-        //위도,경도 전달하여 날씨 정보 가져와 ManageRental 저장
         mContext.handler.sendEmptyMessage(mContext.THREAD_HANDLER_SUCCESS_INFO);
         //Thread 작업 종료, UI 작업을 위해 MainHandler에 Message보냄    }
     }

@@ -1,48 +1,32 @@
 package com.example.myapplication;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.UiThread;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 
 import com.naver.maps.geometry.LatLng;
-import com.naver.maps.map.CameraPosition;
-import com.naver.maps.map.CameraUpdate;
 import com.naver.maps.map.MapFragment;
 import com.naver.maps.map.NaverMap;
 import com.naver.maps.map.OnMapReadyCallback;
 import com.naver.maps.map.UiSettings;
 import com.naver.maps.map.overlay.Align;
-import com.naver.maps.map.overlay.InfoWindow;
 import com.naver.maps.map.overlay.Marker;
-import com.naver.maps.map.overlay.OverlayImage;
 import com.naver.maps.map.util.FusedLocationSource;
-import com.naver.maps.map.util.MarkerIcons;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,95 +37,65 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
+public class RentActivity extends AppCompatActivity implements OnMapReadyCallback{
     private static final int ACCESS_LOCATION_PERMISSION_REQUEST_CODE = 100;
     private FusedLocationSource locationSource;
 
-    private NaverMap naverMap;
-    Switch roadSwitch;
+    private NaverMap naver;
 
     Context context;
 
-    private static String TAG = "myapplication_MainActivity";
+    private static String TAG = "myapplication_RentActivity";
 
     private static final String TAG_JSON="webnautes";
+    private static final String TAG_NAME = "name";
     private static final String TAG_ADDRESS = "address";
-    private static final String TAG_SAGOGUNSU = "sagogunsu";
-    private static final String TAG_SAMANGJASU ="samangjasu";
     private static final String TAG_LONGITUDE="longitude";
     private static final String TAG_LATITUDE ="latitude";
 
-    private TextView mTextViewResult;
-    ArrayList<HashMap<String, String>> mArrayList;
-    String mJsonString;
+    private TextView TextViewResult;
+    ArrayList<HashMap<String, String>> ArrayList;
+    String JsonString;
 
-    double latitudeValue;
-    double longitudeValue;
+    double latValue;
+    double longValue;
 
-    // php 서버로 부터 받아온 사고 데이터를 저장할 리스트
-    ArrayList<Double> lat_list;
-    ArrayList<Double> lng_list;
-    ArrayList<String> sago_list;
+    // php 서버로 부터 받아온 대여소 데이터를 저장할 리스트
+    ArrayList<Double> latitude_list;
+    ArrayList<Double> longitude_list;
+    ArrayList<String> name_list;
 
-    //사고 마커를 관리하는 객체를 담을 리스트
-    ArrayList<Marker> markers_list;
+    //대여소 마커를 관리하는 객체를 담을 리스트
+    ArrayList<Marker> rental_list;
 
     @SuppressLint("SetTextI18n")
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_rent);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        //사고정보
-        GetData task = new GetData();
-        task.execute("http://congping2.dothome.co.kr/bb.php");
-        lat_list = new ArrayList<>();
-        lng_list = new ArrayList<>();
-        sago_list = new ArrayList<>();
-        markers_list = new ArrayList<>();
+        //대여소 정보
+        GetRental getRental = new GetRental();
+        getRental.execute("http://congping2.dothome.co.kr/aa.php");
+        latitude_list = new ArrayList<>();
+        longitude_list = new ArrayList<>();
+        name_list = new ArrayList<>();
+        rental_list = new ArrayList<>();
 
         //지도 view
         MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        mTextViewResult = (TextView) findViewById(R.id.textView_main_result);
-        mTextViewResult.setVisibility(View.INVISIBLE);
-        mArrayList = new ArrayList<>();
-
-
-        //특정시간에 사고주의알림
-        new AlarmHATT(getApplicationContext()).Alarm();
-
-
-        //자전거 도로
-        roadSwitch = (Switch) findViewById(R.id.roadSwitch);
-        roadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked == true){
-                    Toast.makeText(MainActivity.this, "자전거도로 표시", Toast.LENGTH_SHORT).show();
-                    //자전거 도로 표시 on
-                    naverMap.setLayerGroupEnabled(NaverMap.LAYER_GROUP_BICYCLE, true);
-                }
-                else{
-                    //자전거 도로 표시 off
-                    naverMap.setLayerGroupEnabled(NaverMap.LAYER_GROUP_BICYCLE, false);
-                }
-            }
-        });
+        TextViewResult = (TextView) findViewById(R.id.textView_main_result);
+        TextViewResult.setVisibility(View.INVISIBLE);
+        ArrayList = new ArrayList<>();
 
         //툴바
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -149,8 +103,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         toolbar.setBackgroundColor(Color.BLACK);
     }
 
-    //자전거 사고
-    private class GetData extends AsyncTask<String, Void, String> {
+    //자전거 대여소
+    private class GetRental extends AsyncTask<String, Void, String> {
         ProgressDialog progressDialog;
         String errorString = null;
 
@@ -158,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = ProgressDialog.show(MainActivity.this,
+            progressDialog = ProgressDialog.show(RentActivity.this,
                     "Please Wait", null, true, true);
         }
 
@@ -168,15 +122,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             super.onPostExecute(result);
 
             progressDialog.dismiss();
-            mTextViewResult.setText(result);
+            TextViewResult.setText(result);
             Log.d(TAG, "response  - " + result);
 
             if (result == null){
-                mTextViewResult.setText(errorString);
+                TextViewResult.setText(errorString);
             }
             else {
-                mJsonString = result;
-                //사고 정보 매핑하는 JSON
+                JsonString = result;
+                //대여소 정보 매핑하는 JSON
                 showResult();
             }
         }
@@ -224,36 +178,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    //사고정보 매핑
+    //대여소 정보 매핑
     private void showResult(){
 
         //데이터를 담아놓을 리스트를 초기화한다.
-        lat_list.clear();
-        lng_list.clear();
-        sago_list.clear();
+        latitude_list.clear();
+        longitude_list.clear();
+        name_list.clear();
 
         try {
-            JSONObject accidentObject = new JSONObject(mJsonString);
-            JSONArray accidentArray = accidentObject.getJSONArray(TAG_JSON);
+            JSONObject rentalObject = new JSONObject(JsonString);
+            JSONArray rentalArray = rentalObject.getJSONArray(TAG_JSON);
 
-            for(int i=0;i<accidentArray.length();i++){
+            for(int i=0;i<rentalArray.length();i++){
 
-                JSONObject item = accidentArray.getJSONObject(i);
+                JSONObject rent = rentalArray.getJSONObject(i);
 
-                String address = item.getString(TAG_ADDRESS);
-                String sagogunsu = item.getString(TAG_SAGOGUNSU);
-                String samangjasu = item.getString(TAG_SAMANGJASU);
-                String longitude = item.getString(TAG_LONGITUDE);
-                String latitude = item.getString(TAG_LATITUDE);
+                String address = rent.getString(TAG_ADDRESS);
+                String name = rent.getString(TAG_NAME);
+                String longitude = rent.getString(TAG_LONGITUDE);
+                String latitude = rent.getString(TAG_LATITUDE);
 
                 //위도경도는 숫자로 바꿔줌
-                latitudeValue = Double.parseDouble(latitude); //converting string latitude value to double
-                longitudeValue = Double.parseDouble(longitude); //converting string longitude value to double
+                latValue = Double.parseDouble(latitude); //converting string latitude value to double
+                longValue = Double.parseDouble(longitude); //converting string longitude value to double
 
                 //마커리스트담는 변수들
-                lat_list.add(latitudeValue);
-                lng_list.add(longitudeValue);
-                sago_list.add(sagogunsu);
+                latitude_list.add(latValue);
+                longitude_list.add(longValue);
+                name_list.add(name);
 
             }
             showMarker();
@@ -271,38 +224,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void run() {
                 // 백그라운드 스레드
-                for(Marker marker : markers_list){
-                    marker.setMap(null);
+                for(Marker rental_marker : rental_list){
+                    rental_marker.setMap(null);
                 }
-                markers_list.clear();
-
-                InfoWindow infoWindow = new InfoWindow();
+                rental_list.clear();
 
                 // 가져온 데이터의 수 만큼 마커 객체를 만들어 표시한다.
-                for(int i= 0 ; i< lat_list.size(); i++) {
+                for(int i= 0 ; i< 200; i++) {
                     // 값 추출
-                    double lat = lat_list.get(i);
-                    double lng = lng_list.get(i);
-                    String sagogunsu = sago_list.get(i);
+                    double Lat = latitude_list.get(i);
+                    double Lng = longitude_list.get(i);
+                    String name = name_list.get(i);
 
                     // 생성할 마커의 정보를 가지고 있는 객체를 생성
-                    Marker marker = new Marker();
-                    marker.setPosition(new LatLng(lat, lng));
-//                    marker.setIcon(MarkerIcons.BLACK);
-//                    marker.setIconTintColor(Color.RED);  //마커색깔
-                    marker.setIconPerspectiveEnabled(true);
-                    marker.setWidth(Marker.SIZE_AUTO);
-                    marker.setHeight(Marker.SIZE_AUTO);
-                    marker.setWidth(60);
-                    marker.setHeight(80);
-                    marker.setCaptionText("사고건수 : " + sagogunsu);
-                    marker.setCaptionOffset(5);  //마커와 텍스간의 거리
-                    marker.setCaptionAligns(Align.Top);  //텍스트 위치 마커 위로
-                    marker.setCaptionTextSize(11);  //텍스트 사이즈 설정
-                    marker.setIcon(OverlayImage.fromResource(R.drawable.accident));
+                    Marker rental_marker = new Marker();
+                    rental_marker.setPosition(new LatLng(Lat, Lng));
+
+                    rental_marker.setIconPerspectiveEnabled(true);
+                    rental_marker.setWidth(Marker.SIZE_AUTO);
+                    rental_marker.setHeight(Marker.SIZE_AUTO);
+                    rental_marker.setWidth(60);
+                    rental_marker.setHeight(80);
+                    rental_marker.setCaptionText(name);
+                    rental_marker.setCaptionOffset(5);  //마커와 텍스간의 거리
+                    rental_marker.setCaptionAligns(Align.Top);  //텍스트 위치 마커 위로
+                    rental_marker.setCaptionTextSize(11);  //텍스트 사이즈 설정
+//                    rental_marker.setIcon(OverlayImage.fromResource(R.drawable.rent_bike));
 
                     // 마커를 지도에 표시한다.
-                    markers_list.add(marker);
+                    rental_list.add(rental_marker);
                 }
             }
         });
@@ -343,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(@NonNull final NaverMap naverMap) {
-        this.naverMap = naverMap;
+        this.naver = naverMap;
 
         //사용자에게 먼저 위치 정보를 허용할지 물어봄
         locationSource = new FusedLocationSource(this, ACCESS_LOCATION_PERMISSION_REQUEST_CODE);
@@ -352,9 +302,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //현위치 ui
         uiSettings.setLocationButtonEnabled(true);
 
-        //사고정보 리스트 마커
-        for (Marker marker : markers_list) {
-            marker.setMap(naverMap);
+        //대여소 정보 리스트 마커
+        for (Marker rental_marker : rental_list) {
+            rental_marker.setMap(naverMap);
         }
     }
 
@@ -366,30 +316,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             case ACCESS_LOCATION_PERMISSION_REQUEST_CODE:
                 locationSource.onRequestPermissionsResult(requestCode, permissions, grantResults);
                 return;
-        }
-    }
-
-    //알림
-    public class AlarmHATT {
-        private Context context;
-
-        public AlarmHATT(Context context) {
-            this.context = context;
-        }
-
-        public void Alarm() {
-            AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            Intent intent = new Intent(MainActivity.this, BroadcastD.class);
-
-            PendingIntent sender = PendingIntent.getBroadcast(MainActivity.this, 0, intent, 0);
-
-            Calendar calendar = Calendar.getInstance();
-
-            //사고많은 6시 퇴근시간에 알림창 띄우기
-            calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 18, 0, 0);
-
-            //알람 예약
-            am.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender);
         }
     }
 

@@ -206,29 +206,29 @@ public class WeatherActivity extends AppCompatActivity {
     };
 
 
+    @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
-            case R.id.favorite:
-                Toast.makeText(this, "즐겨찾기", Toast.LENGTH_SHORT).show();
-                Intent favorite = new Intent(WeatherActivity.this, FavoriteActivity.class);
-                startActivity(favorite);
+            case R.id.rental_list:
+                Toast.makeText(this, "대여소 리스트", Toast.LENGTH_SHORT).show();
+                Intent list = new Intent(this, RentalActivity.class);
+                startActivity(list);
                 return true;
-            case R.id.search:
-                Toast.makeText(this, "검색", Toast.LENGTH_SHORT).show();
-                Intent search = new Intent(WeatherActivity.this, RentalActivity.class);
-                startActivity(search);
+            case R.id.rental_marker:
+                Toast.makeText(this, "대여소", Toast.LENGTH_SHORT).show();
+                Intent rental_marker = new Intent(this, RentActivity.class);
+                startActivity(rental_marker);
                 return true;
             case R.id.weather:
                 Toast.makeText(this, "날씨", Toast.LENGTH_SHORT).show();
-                Intent weather= new Intent(WeatherActivity.this, WeatherActivity.class);
+                Intent weather= new Intent(this, WeatherActivity.class);
                 startActivity(weather);
                 return true;
             case R.id.home:
                 Toast.makeText(this, "홈", Toast.LENGTH_SHORT).show();
-                Intent home= new Intent(WeatherActivity.this, MainActivity.class);
+                Intent home= new Intent(this, MainActivity.class);
                 startActivity(home);
                 return true;
-
         }
         return super.onOptionsItemSelected(item);
     }
