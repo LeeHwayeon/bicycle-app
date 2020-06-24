@@ -87,25 +87,27 @@ public class RentalManager extends Thread {
             JSONObject jsonObject = new JSONObject(receiveMsg).getJSONObject("rentBikeStatus");
             JSONArray jsonArray = jsonObject.getJSONArray("row");
 
-            rackTotCnt = jsonArray.getJSONObject(0).getString("rackTotCnt");
-            stationName = jsonArray.getJSONObject(0).getString("stationName");
-            parkingBikeTotCnt = jsonArray.getJSONObject(0).getString("parkingBikeTotCnt");
-            stationLatitude = jsonArray.getJSONObject(0).getString("stationLatitude");
-            stationLongitude = jsonArray.getJSONObject(0).getString("stationLongitude");
+            for (int i=1; i<jsonArray.length(); i++) {
+                rackTotCnt = jsonArray.getJSONObject(0).getString("rackTotCnt");
+                stationName = jsonArray.getJSONObject(0).getString("stationName");
+                parkingBikeTotCnt = jsonArray.getJSONObject(0).getString("parkingBikeTotCnt");
+                stationLatitude = jsonArray.getJSONObject(0).getString("stationLatitude");
+                stationLongitude = jsonArray.getJSONObject(0).getString("stationLongitude");
 
-            ContentValues RentalContent = new ContentValues();
-            RentalContent.put("rackTotCnt", rackTotCnt);
-            RentalContent.put("stationName", stationName);
-            RentalContent.put("parkingBikeTotCnt", parkingBikeTotCnt);
-            RentalContent.put("stationLatitude", stationLatitude);
-            RentalContent.put("stationLongitude", stationLongitude);
+                ContentValues RentalContent = new ContentValues();
+                RentalContent.put("rackTotCnt", rackTotCnt);
+                RentalContent.put("stationName", stationName);
+                RentalContent.put("parkingBikeTotCnt", parkingBikeTotCnt);
+                RentalContent.put("stationLatitude", stationLatitude);
+                RentalContent.put("stationLongitude", stationLongitude);
 
 
-            RentalTotalValue.add(RentalContent);
+                RentalTotalValue.add(RentalContent);
 
-            Log.i("current RentalContent", String.valueOf(RentalContent));
-            Log.i("current RentalTotalValue", String.valueOf(RentalTotalValue));
-
+                Log.i("current RentalContent", String.valueOf(RentalContent));
+                Log.i("current RentalTotalValue", String.valueOf(RentalTotalValue));
+            }
+            
         } catch (JSONException e) {
             e.printStackTrace();
         }
