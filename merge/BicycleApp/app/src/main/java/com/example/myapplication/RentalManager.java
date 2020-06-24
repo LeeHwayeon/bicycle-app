@@ -88,11 +88,11 @@ public class RentalManager extends Thread {
             JSONArray jsonArray = jsonObject.getJSONArray("row");
 
             for (int i=1; i<jsonArray.length(); i++) {
-                rackTotCnt = jsonArray.getJSONObject(0).getString("rackTotCnt");
-                stationName = jsonArray.getJSONObject(0).getString("stationName");
-                parkingBikeTotCnt = jsonArray.getJSONObject(0).getString("parkingBikeTotCnt");
-                stationLatitude = jsonArray.getJSONObject(0).getString("stationLatitude");
-                stationLongitude = jsonArray.getJSONObject(0).getString("stationLongitude");
+                rackTotCnt = jsonArray.getJSONObject(i).getString("rackTotCnt");
+                stationName = jsonArray.getJSONObject(i).getString("stationName");
+                parkingBikeTotCnt = jsonArray.getJSONObject(i).getString("parkingBikeTotCnt");
+                stationLatitude = jsonArray.getJSONObject(i).getString("stationLatitude");
+                stationLongitude = jsonArray.getJSONObject(i).getString("stationLongitude");
 
                 ContentValues RentalContent = new ContentValues();
                 RentalContent.put("rackTotCnt", rackTotCnt);
@@ -107,7 +107,7 @@ public class RentalManager extends Thread {
                 Log.i("current RentalContent", String.valueOf(RentalContent));
                 Log.i("current RentalTotalValue", String.valueOf(RentalTotalValue));
             }
-            
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

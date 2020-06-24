@@ -98,7 +98,7 @@ public class RentalActivity extends AppCompatActivity {
     // 읽어온 현재 날씨 출력
     public String CurrentPrintValue() {
         String currentData = "";
-        for(int i = 0; i < 1; i++) {
+        for(int i = 0; i < mCurrentRental.size(); i++) {
             currentData = currentData
                     + "rackTotCnt"+mCurrentRental.get(i).rackTotCnt + " / "
                     + "stationName"+mCurrentRental.get(i).stationName + "\r\n"
